@@ -1,0 +1,2 @@
+function segment(imgName)
+end
