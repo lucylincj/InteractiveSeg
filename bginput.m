@@ -6,23 +6,21 @@ function  bginput(strg)
 % Affiliation - Robotics Institute, CMU, Pittsburgh
 % 2006-05-15
 
-% Global variables referenced in this funciton
-global fgflag fgbc bgbc fgpixels bgpixels spflag;
-
-
-
-if(strcmp(strg,'SmartRectangle'))
-
-    % Gui related flag
-    fgflag = 2;
-    spflag = 1;
-
-else
-    % Gui related flag
+    % Global variables referenced in this funciton
+    global fgflag fgbc bgbc fgpixels bgpixels spflag mflag;
     fgflag = 0;
-    spflag = 2;
+    if(strcmp(strg,'SLIC'))
+        spflag = 1;
+        mflag = 0;
 
-end
+    elseif(strcmp(strg,'SLICO'))
+        spflag = 2;
+        mflag = 0;
+
+    elseif(strcmp(strg,'Fix'))
+        mflag = 1;
+
+    end
     hfig = gcf;
     hold on;
     % Call track function on button press
