@@ -1,4 +1,11 @@
 function MainUI
+clear all
+
+% Global Variables
+global sopt;
+
+% Initialize all required parameters
+sopt = mksopt;
 
 % Main Menu 
 hfig = figure('units','pixels','position', [50 100 1100 600],...

@@ -1,5 +1,13 @@
 function LoadImgUI
 
+% Global Variables
+% Req by radio button RadioButtonFn
+global hfig longfilename;
+
+% Get handle to current figure;
+hfig = gcf;
+
+
 % Call built-in file dialog to select image file
 [filename,pathname] = uigetfile('images/*.*','Select image file');
 if ~ischar(filename); return; end
@@ -7,9 +15,9 @@ if ~ischar(filename); return; end
 %%%%%%%%%%%%%%%%%%%Radio Buttons%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 h = uibuttongroup('visible','off','Position',[0.7 0.7 0.15 0.18]);
-u0 = uicontrol('Style','Radio','String','SmartRectangle',...
+u0 = uicontrol('Style','Radio','String','SLIC',...
     'pos',[10 20 120 30],'parent',h,'HandleVisibility','off');
-u1 = uicontrol('Style','Radio','String','SmartRefine',...
+u1 = uicontrol('Style','Radio','String','SLICO',...
     'pos',[10 60 120 30],'parent',h,'HandleVisibility','off');
 set(h,'SelectionChangeFcn',@RadioButtonFn);
 set(h,'SelectedObject',[]);
@@ -31,30 +39,6 @@ set(data.ui.ih_img, 'Cdata', Im);
 axis('image');axis('ij');axis('off');
 drawnow;
 
-end
-
-function RadioButtonFn(source, eventdata)
-% RADIOBUTTONFUNCTION - This function is called whenever there is change in
-% choice of radio button
-
-% Global Variables
-global hfig longfilename;
-
-% Pass string value to seed selection function
-strg = get(eventdata.NewValue,'String');
-
-%%%%%%%%%%%%%%%%Seed Selection Buttons%%%%%%%%%%%%%%%%%%%
-% Calls fginput - gets foreground pixels from the user
-data.ui.push_fg = uicontrol(hfig, 'Style','pushbutton', 'Units', 'Normalized','Position',[.7 .6 .1 .05], ...
-    'String','Foreground','Callback', ['fginput ',strg]);
-
-% Calls bginput - gets background pixels from the user
-data.ui.push_bg = uicontrol(hfig, 'Style','pushbutton', 'Units', 'Normalized','Position',[.7 .5 .1 .05], ...
-    'String','Background','Callback', ['bginput ',strg]);
-
-% Calls Segment - graph-cuts on the image
-data.ui.push_bg = uicontrol(hfig, 'Style','pushbutton', 'Units', 'Normalized','Position',[.7 .4 .1 .05], ...
-    'String','Graph Cuts','Callback', ['Segment ',longfilename]);
-drawnow;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 end
