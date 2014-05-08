@@ -1,9 +1,9 @@
 function Segment(imgPath)
     global sopt fgpixels bgpixels spflag mflag;
-    global oriImg segments lab; %for Fix
+    global oriImg segments lab editfgpixels editbgpixels; %for FixEdge
     
     if(mflag==1) %Fix
-        display('test fix');
+        EditBoundary(oriImg, segments, lab, editfgpixels, editbgpixels);
     else %first segment
         % Segmented output placeholder
         %SegImage = zeros(size(ImName));

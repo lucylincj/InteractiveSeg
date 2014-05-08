@@ -17,7 +17,7 @@ function  fginput(strg)
     elseif(strcmp(strg,'SLICO'))
         spflag = 2;
         mflag = 0;
-    elseif(strcmp(strg,'Fix'))
+    elseif(strcmp(strg,'Edit'))
         mflag = 1;
 
     end
