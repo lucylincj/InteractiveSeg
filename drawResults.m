@@ -4,7 +4,7 @@ function drawResults(img, segments, result)
         map(segments==i-1) = result(i) -1;
     end
 
-    figure; imagesc(map);
+    %figure; imagesc(map);
     img(:, :, 1)  = img(:, :, 1) .* uint8(map);
     img(:, :, 2)  = img(:, :, 2) .* uint8(map);
     img(:, :, 3)  = img(:, :, 3) .* uint8(map);

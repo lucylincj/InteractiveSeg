@@ -1,11 +1,11 @@
-function main(superpixel, interactive)
+function main(superpixel)
     %add necessary path
     addpath('Bk') ;
     addpath('Bk/bin') ;
     addpath(genpath('vlfeat-0.9.18')) ;
 
     %parameters
-    infinite = 9999;
+    infinite = 999999;
 
     %load image
     imgPath = 'images/flowers.png';
@@ -15,7 +15,7 @@ function main(superpixel, interactive)
     h = size(img, 2);
     
     %load mask
-    maskPath = 'mask/flowersmask.jpg';
+    maskPath = 'mask/flowers_mask.jpg';
     imgMask = imread(maskPath);
 
     %load and build graphcut library
@@ -38,7 +38,7 @@ function main(superpixel, interactive)
         numSegments = segments(w,h) + 1;
         
     elseif(strcmp(superpixel, 'SLICO'))
-        fid=fopen('images/flowers_514.dat','rt');
+        fid=fopen('images/flowers.dat','rt');
         A = fread(fid,'*uint32');
         fclose(fid);
         segments = reshape(A, h, w)';

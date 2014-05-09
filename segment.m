@@ -18,7 +18,7 @@ function Segment(imgPath)
         addpath(genpath('vlfeat-0.9.18')) ;
 
         %parameters
-        infinite = 9999;
+        infinite = 999999;
 
         %load image
         %imgPath = 'images/flowers.png';
