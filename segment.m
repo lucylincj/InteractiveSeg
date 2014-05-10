@@ -1,16 +1,14 @@
 function Segment(imgPath)
     global sopt fgpixels bgpixels spflag mflag;
     global oriImg segments lab editfgpixels editbgpixels; %for FixEdge
+    % GUI specific flag
+    fgflag = 2;
     
-    if(mflag==1) %Fix
+    if(mflag==1) %Edit
         EditBoundary(oriImg, segments, lab, editfgpixels, editbgpixels);
+        
     else %first segment
-        % Segmented output placeholder
-        %SegImage = zeros(size(ImName));
         [pathstr, name, ext] = fileparts(imgPath);
-
-        % GUI specific flag
-        fgflag = 2;
 
         %add necessary path
         addpath('Bk') ;
@@ -51,14 +49,14 @@ function Segment(imgPath)
             numSegments = segments(w,h) + 1;
 
         elseif(spflag == 2) %SLICO
-            fid=fopen(['images/', name,'.dat'],'rt');
+            fid=fopen(['SLICO_dat/', name,'.dat'],'rt');
             A = fread(fid,'*uint32');
             fclose(fid);
             segments = reshape(A, h, w)';
             numSegments = max(A) + 1;
-            %//////////////////////////////////////////////////////////////%
         end
         tic
+        
         %compute mean color of each segment
         mC = zeros(3, numSegments);
 
@@ -81,11 +79,12 @@ function Segment(imgPath)
 
         BY = bgpixels(:,1);
         BX = bgpixels(:,2);
-        for i = 1:size(FX, 1)
-            fSeg(segments(FX(i), FY(i))+1) = 1;
-        end
+
         for i = 1:size(BX, 1)
             bSeg(segments(BX(i), BY(i))+1) = 1;
+        end
+        for i = 1:size(FX, 1)
+            fSeg(segments(FX(i), FY(i))+1) = 1;
         end
         uncertain = find((fSeg - bSeg)==0);%this will not be changed
 
@@ -95,18 +94,19 @@ function Segment(imgPath)
 
         %distinguish neighbors
         tic
-        neighboring = zeros(numSegments, numSegments);
-        seg2 = [0 1 0; 1 1 1; 0 1 0];
-        for i = 1:numSegments
-            seg1 = zeros(w, h);
-            seg1(segments==i-1) = 1;
-            x = 0; y = 0;
-            result = imdilate(seg1, seg2) - seg1;
-            [x, y] = find(result==1);
-            for k = 1:size(x, 1)
-                neighboring(i, segments(x, y)+1) = 1;
-            end
-        end
+%         neighboring = zeros(numSegments, numSegments);
+%         seg2 = [0 1 0; 1 1 1; 0 1 0];
+%         for i = 1:numSegments
+%             seg1 = zeros(w, h);
+%             seg1(segments==i-1) = 1;
+%             x = 0; y = 0;
+%             result = imdilate(seg1, seg2) - seg1;
+%             [x, y] = find(result==1);
+%             for k = 1:size(x, 1)
+%                 neighboring(i, segments(x, y)+1) = 1;
+%             end
+%         end
+        neighboring = FindNeighbor(segments, numSegments);
         toc
 
         tic
