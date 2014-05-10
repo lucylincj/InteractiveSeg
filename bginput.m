@@ -1,4 +1,3 @@
-%--------------------------------------------------------------------------
 function  bginput(strg)
 % BGINPUT  - This function gets the background pixels from user input
 % BGINPUT(STRG) - strg  - Smart Refine or Smart Rectangle
