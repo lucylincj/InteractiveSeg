@@ -1,3 +1,5 @@
+% tmp
+% flowers doubleMarked resion: 348 381
 function EditBoundary(oriImg, segments, lab, editfgpixels, editbgpixels)
     sizef = size(editfgpixels, 1);
     sizeb = size(editbgpixels, 1);
@@ -24,11 +26,13 @@ function EditBoundary(oriImg, segments, lab, editfgpixels, editbgpixels)
     %
     
     record = zeros(size(lab, 1), size(lab, 2));
+    doubleMarked = zeros(size(lab, 1), size(lab, 2));
     if(sizef>0)
         FY = editfgpixels(:,1);
         FX = editfgpixels(:,2);
         for i = 1:sizef
             lab(segments(FX(i), FY(i))+1) = 2;
+            record(segments(FX(i), FY(i))+1) = record(segments(FX(i), FY(i))+1) + 1; 
         end
     end
     
@@ -37,10 +41,11 @@ function EditBoundary(oriImg, segments, lab, editfgpixels, editbgpixels)
         BX = editbgpixels(:,2);
         for i = 1:sizeb
             lab(segments(BX(i), BY(i))+1) = 1;
+            if(record(segments(BX(i), BY(i))+1)>0)
+                doubleMarked(segments(BX(i), BY(i))+1) =  1;
+            end
         end 
     end
-
-    
     
     drawResults(oriImg, segments, lab);
     

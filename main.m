@@ -38,7 +38,7 @@ function main(superpixel)
         numSegments = segments(w,h) + 1;
         
     elseif(strcmp(superpixel, 'SLICO'))
-        fid=fopen('images/flowers.dat','rt');
+        fid=fopen('SLICO_dat/flowers.dat','rt');
         A = fread(fid,'*uint32');
         fclose(fid);
         segments = reshape(A, h, w)';
