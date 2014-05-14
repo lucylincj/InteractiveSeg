@@ -1,5 +1,5 @@
 %for testing new features
-function testBranch()
+function [idx, mask] = testBranch(num)
      %load image
     imgPath = 'images/flowers.png';
     oriImg = imread(imgPath);
@@ -16,15 +16,15 @@ function testBranch()
     
     %process ambiguous region
     %for flowers.png: 348 381
-    [x1, y1] = find(segments ==347);
+    [x1, y1] = find(segments ==num);
     top = min(x1);
     bottom = max(x1);
     left = min(y1);
     right = max(y1);
+    idx = [top, bottom, left, right];
     
     cropImg = oriImg(top:bottom, left:right,:);
     tmp = (segments ==347);
-    mask = tmp(top:bottom, left:right);
     figure; imshow(cropImg);
     cform = makecform('srgb2lab');
     labImg = applycform(cropImg,cform);
@@ -52,10 +52,10 @@ function testBranch()
     vl_setup();
     
     [idx_, C_, e] = vl_kmeans(ab, nColors, 'verbose') ;
-    result = reshape(C_, nrows, ncols)';
+    mask = reshape(C_, nrows, ncols);
     %result = double(result) .* double(mask);
-    figure; imagesc(result);
-    
+    figure; imagesc(mask);
+    mask = mask - 1;
      
     
     

@@ -74,33 +74,9 @@ function main(superpixel)
 
     [dF dB] = updateMinDis(uncertain, numSegments, mC, fSeg, bSeg);
     toc
-    % %temp
-    %calculate mean color of forground and background
-    % f_mC = [mC(1,:)*fSeg' mC(2,:)*fSeg' mC(3,:)*fSeg'];
-    % f_mC = f_mC / sum(fSeg);
-    % b_mC = [mC(1,:)*bSeg' mC(2,:)*bSeg' mC(3,:)*bSeg'];
-    % b_mC = b_mC / sum(bSeg);
-
-    % for i = 1:size(uncertain, 1)
-    %     dF(i) = sqrt((f_mC - mC(:, i)') * (f_mC - mC(:, i)')');
-    %     dB(i) = sqrt((b_mC - mC(:, i)') * (b_mC - mC(:, i)')');
-    % end
-
 
     %distinguish neighbors
     tic
-%     neighboring = zeros(numSegments, numSegments);
-%     seg2 = [0 1 0; 1 1 1; 0 1 0];
-%     for i = 1:numSegments
-%         seg1 = zeros(w, h);
-%         seg1(segments==i-1) = 1;
-%         x = 0; y = 0;
-%         result = imdilate(seg1, seg2) - seg1;
-%         [x, y] = find(result==1);
-%         for k = 1:size(x, 1)
-%             neighboring(i, segments(x, y)+1) = 1;
-%         end
-%     end
     neighboring = FindNeighbor(segments, numSegments);
     toc
     
@@ -109,8 +85,7 @@ function main(superpixel)
     E1 = updateE1(numSegments, fSeg, bSeg, dF, dB, infinite);
     E2 = updateE2(numSegments, fSeg, bSeg, neighboring, mC) ;
     toc
-    %lambda = 16;
-    %while (lambda >= 1)
+
     tic
         hinc = BK_Create(numSegments,2*numSegments);
         BK_SetUnary(hinc, E1); 
@@ -120,28 +95,12 @@ function main(superpixel)
 
         drawResults(oriImg, segments, lab);
 
-        %//////////////////////////new round values/////////////////////////
-    %     fSeg = lab - 1;
-    %     bSeg = 1 - fSeg;
-    %     
-    %     [dF dB] = updateMinDis(uncertain, numSegments, mC, fSeg, bSeg);
-    %     E1 = updateE1(numSegments, fSeg, bSeg, dF, dB, infinite);
-    %     E2 = updateE2(numSegments, fSeg, bSeg, neighboring, mC) ;
-
-    %     hnew = BK_Create(numSegments,2*numSegments);
-    %     BK_SetNeighbors(hnew,E2);
-    %     BK_SetUnary(hnew,E1); 
-    %     %tic; 
-    %     e_new = BK_Minimize(hnew);
-    %     time_new(end+1) = toc;
-    %     BK_Delete(h new);
-
-        %Assert(abs(e_inc - e_new) < 1e-6);
         BK_Delete(hinc);
         %lambda = lambda*0.9;
     %end 
     toc
-
+    [idx, M] = testBranch(380);
+    drawFineResults(oriImg, segments, lab, idx, M, 380);
     %release memory
     %BK_Delete(hinc);
 
