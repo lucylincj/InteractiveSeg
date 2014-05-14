@@ -1,19 +1,6 @@
 %for testing new features
-function [idx, mask] = testBranch(num)
-     %load image
-    imgPath = 'images/flowers.png';
-    oriImg = imread(imgPath);
-    img = im2single(oriImg) ;
-    w = size(img, 1);
-    h = size(img, 2);
-    
-    %load SLICO result
-    fid=fopen('SLICO_dat/flowers.dat','rt');
-    A = fread(fid,'*uint32');
-    fclose(fid);
-    segments = reshape(A, h, w)';
-    numSegments = max(A) + 1;
-    
+function [idx, mask] = testBranch(oriImg, segments, num)
+
     %process ambiguous region
     %for flowers.png: 348 381
     [x1, y1] = find(segments ==num);
@@ -24,7 +11,6 @@ function [idx, mask] = testBranch(num)
     idx = [top, bottom, left, right];
     
     cropImg = oriImg(top:bottom, left:right,:);
-    tmp = (segments ==347);
     figure; imshow(cropImg);
     cform = makecform('srgb2lab');
     labImg = applycform(cropImg,cform);
@@ -51,13 +37,16 @@ function [idx, mask] = testBranch(num)
     addpath(genpath('vlfeat-0.9.18')) ;
     vl_setup();
     
-    [idx_, C_, e] = vl_kmeans(ab, nColors, 'verbose') ;
+    [idx_, C_, e] = vl_kmeans(ab, nColors, 'verbose','distance', 'l1') ;
     mask = reshape(C_, nrows, ncols);
     %result = double(result) .* double(mask);
     figure; imagesc(mask);
     mask = mask - 1;
      
     
+    I=rgb2gray(cropImg);
+    L = watershed(I);
+    %figure; imagesc(L);
     
     
 end

@@ -2,7 +2,8 @@ function drawFineResults(img, segments, result, testIdx, testM, num)
     map = zeros(size(segments, 1), size(segments, 2));
 
     tmp = ones(size(testM, 1), size(testM, 2));
-    map(testIdx(1):testIdx(2), testIdx(3):testIdx(4)) = xor(testM, tmp);
+    %map(testIdx(1):testIdx(2), testIdx(3):testIdx(4)) = xor(testM, tmp);
+    map(testIdx(1):testIdx(2), testIdx(3):testIdx(4)) = testM;
 
     for i = 1:size(result, 1)
         if(i ~= num+1)

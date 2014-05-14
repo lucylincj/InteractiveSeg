@@ -8,14 +8,14 @@ function main(superpixel)
     infinite = 999999;
 
     %load image
-    imgPath = 'images/flowers.png';
+    imgPath = 'images/horse.jpg';
     oriImg = imread(imgPath);
     img = im2single(oriImg) ;
     w = size(img, 1);
     h = size(img, 2);
     
     %load mask
-    maskPath = 'mask/flowers_mask.jpg';
+    maskPath = 'mask/horse_mask1.jpg';
     imgMask = imread(maskPath);
 
     %load and build graphcut library
@@ -38,7 +38,7 @@ function main(superpixel)
         numSegments = segments(w,h) + 1;
         
     elseif(strcmp(superpixel, 'SLICO'))
-        fid=fopen('SLICO_dat/flowers.dat','rt');
+        fid=fopen('SLICO_dat/horse.dat','rt');
         A = fread(fid,'*uint32');
         fclose(fid);
         segments = reshape(A, h, w)';
@@ -99,8 +99,10 @@ function main(superpixel)
         %lambda = lambda*0.9;
     %end 
     toc
-    [idx, M] = testBranch(380);
-    drawFineResults(oriImg, segments, lab, idx, M, 380);
+    %flowers 347 355 (segments label)
+    %horse 351   365   366   386
+    [idx, M] = testBranch(oriImg, segments, 365);
+    drawFineResults(oriImg, segments, lab, idx, M, 365);
     %release memory
     %BK_Delete(hinc);
 
