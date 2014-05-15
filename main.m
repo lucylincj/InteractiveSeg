@@ -1,21 +1,30 @@
+%///
+% main class for demo
+% already blocked the interactive part
+% please change paths to load in different image set (line 12-14)
+% @parameter: input'SLIC' or 'SLICO'
+% @author: lucylin
+% @date: 05.2013
+%
 function main(superpixel)
+    %parameters
+    infinite = 999999;
+    imgPath = 'images/flowers.png';
+    maskPath = 'mask/flowers_mask1.jpg';
+    maskPath2 = 'mask/flowers_mask2.jpg';
+    
     %add necessary path
     addpath('Bk') ;
     addpath('Bk/bin') ;
     addpath(genpath('vlfeat-0.9.18')) ;
 
-    %parameters
-    infinite = 999999;
-
     %load image
-    imgPath = 'images/horse.jpg';
     oriImg = imread(imgPath);
     img = im2single(oriImg) ;
     w = size(img, 1);
     h = size(img, 2);
     
     %load mask
-    maskPath = 'mask/horse_mask1.jpg';
     imgMask = imread(maskPath);
 
     %load and build graphcut library
@@ -38,7 +47,7 @@ function main(superpixel)
         numSegments = segments(w,h) + 1;
         
     elseif(strcmp(superpixel, 'SLICO'))
-        fid=fopen('SLICO_dat/horse.dat','rt');
+        fid=fopen('SLICO_dat/flowers.dat','rt');
         A = fread(fid,'*uint32');
         fclose(fid);
         segments = reshape(A, h, w)';
@@ -87,24 +96,65 @@ function main(superpixel)
     toc
 
     tic
-        hinc = BK_Create(numSegments,2*numSegments);
-        BK_SetUnary(hinc, E1); 
-        BK_SetNeighbors(hinc, E2);
-        e_inc = BK_Minimize(hinc);
-        lab = BK_GetLabeling(hinc);
+    hinc = BK_Create(numSegments,2*numSegments);
+    BK_SetUnary(hinc, E1); 
+    BK_SetNeighbors(hinc, E2);
+    e_inc = BK_Minimize(hinc);
+    lab = BK_GetLabeling(hinc);
 
-        drawResults(oriImg, segments, lab);
+    map = drawResults(oriImg, segments, lab);
 
-        BK_Delete(hinc);
-        %lambda = lambda*0.9;
-    %end 
+    BK_Delete(hinc);
+
     toc
-    %flowers 347 355 (segments label)
-    %horse 351   365   366   386
-    [idx, M] = testBranch(oriImg, segments, 365);
-    drawFineResults(oriImg, segments, lab, idx, M, 365);
-    %release memory
-    %BK_Delete(hinc);
+    
+    %///////////////////////STEP 2/////////////////////////////%
+    %load mask 2
+    imgMask2 = imread(maskPath2);
+    
+    %identify ambiguous segments
+    uSeg = zeros(numSegments, 4);
+    [new_f1, new_f2] = find(imgMask2(:,:,1) - imgMask2(:,:,2) > 200);
+    [new_b1, new_b2] = find(imgMask2(:,:,3) - imgMask2(:,:,2) > 200);
+    for i = 1:size(new_f1, 1)
+        if(uSeg(segments(new_f1(i), new_f2(i))+1, 1) ~= 1)
+            uSeg(segments(new_f1(i), new_f2(i))+1, 1) = 1;
+            uSeg(segments(new_f1(i), new_f2(i))+1, 2) = 1;
+            uSeg(segments(new_f1(i), new_f2(i))+1, 3) = new_f1(i);
+            uSeg(segments(new_f1(i), new_f2(i))+1, 4) = new_f2(i);
+        end
+    end
+    for i = 1:size(new_b1, 1)
+        if(uSeg(segments(new_b1(i), new_b2(i))+1, 1) ~= 1)
+            uSeg(segments(new_b1(i), new_b2(i))+1, 1) = 1;
+            uSeg(segments(new_b1(i), new_b2(i))+1, 2) = 0;
+            uSeg(segments(new_b1(i), new_b2(i))+1, 3) = new_b1(i);
+            uSeg(segments(new_b1(i), new_b2(i))+1, 4) = new_b2(i);
+        end
+    end
+    
+    seg = find(uSeg(:,1)==1);
+    
+    for i = 1:size(seg, 1)
+        [idx, M] = testBranch(oriImg, segments, seg(i)-1, uSeg(seg(i),:));
+        map(idx(1):idx(2), idx(3):idx(4)) = M;
+        %drawFineResults(oriImg, segments, lab, idx, M, seg(i)-1);
+    end
+    %restore other segments
+    for i = 1:numSegments
+        if(uSeg(i, 1) ~= 1)
+            map(segments==i-1) = lab(i) -1;
+        end
+    end
+    resultImg(:, :, 1)  = oriImg(:, :, 1) .* uint8(map);
+    resultImg(:, :, 2)  = oriImg(:, :, 2) .* uint8(map);
+    resultImg(:, :, 3)  = oriImg(:, :, 3) .* uint8(map);
+
+    figure; imshow(resultImg);
+    % flowers 347 355 (segments label)
+    % horse 351   365   366   386
+    % [idx, M] = testBranch(oriImg, segments, 365);
+    % drawFineResults(oriImg, segments, lab, idx, M, 365);
 
 end
   

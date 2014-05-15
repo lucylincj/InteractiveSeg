@@ -1,6 +1,6 @@
 %for testing new features
-function [idx, mask] = testBranch(oriImg, segments, num)
-
+function [idx, mask] = testBranch(oriImg, segments, num, info)
+    disp(num);
     %process ambiguous region
     %for flowers.png: 348 381
     [x1, y1] = find(segments ==num);
@@ -37,15 +37,24 @@ function [idx, mask] = testBranch(oriImg, segments, num)
     addpath(genpath('vlfeat-0.9.18')) ;
     vl_setup();
     
-    [idx_, C_, e] = vl_kmeans(ab, nColors, 'verbose','distance', 'l1') ;
+    [idx_, C_, e] = vl_kmeans(ab, nColors,'distance', 'l1') ;
     mask = reshape(C_, nrows, ncols);
     %result = double(result) .* double(mask);
     figure; imagesc(mask);
     mask = mask - 1;
+    
+    %identify fg bg region
+    mask_x = info(3) - top + 1;
+    mask_y = info(4) - left + 1;
+    if( xor(mask(mask_x, mask_y), info(2)) ==1 ) %flip fg/ bg
+        tmp = ones(size(mask, 1), size(mask, 2));
+        mask = xor(mask, tmp);
+    end
+        
      
     
-    I=rgb2gray(cropImg);
-    L = watershed(I);
+    %I=rgb2gray(cropImg);
+    %L = watershed(I);
     %figure; imagesc(L);
     
     
