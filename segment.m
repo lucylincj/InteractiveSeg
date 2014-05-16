@@ -49,7 +49,7 @@ function Segment(imgPath)
             numSegments = segments(w,h) + 1;
 
         elseif(spflag == 2) %SLICO
-            fid=fopen(['SLICO_dat/', name,'.dat'],'rt');
+            fid=fopen([pathstr,'/SLICO_dat/', name,'.dat'],'rt');
             A = fread(fid,'*uint32');
             fclose(fid);
             segments = reshape(A, h, w)';

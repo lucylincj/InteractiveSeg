@@ -1,5 +1,5 @@
 %///
-% main class for demo
+% main class for testing and demo
 % already blocked the interactive part
 % please change paths to load in different image set (line 12-14)
 % @parameter: input'SLIC' or 'SLICO'
@@ -9,9 +9,11 @@
 function main(superpixel)
     %parameters
     infinite = 999999;
-    imgPath = 'images/flowers.png';
-    maskPath = 'mask/flowers_mask1.jpg';
-    maskPath2 = 'mask/flowers_mask2.jpg';
+    path = 'D:/InteractiveSegTestImage/';
+    imgPath = [path, '2_89_89895.jpg'];
+    superpixelPath = [path, 'SLICO_dat/2_89_89895.dat'];
+    maskPath = [path, 'mask1/2_89_89895_mask1.jpg'];
+    maskPath2 = [path, 'mask2/2_89_89895_mask2.jpg'];
     
     %add necessary path
     addpath('Bk') ;
@@ -47,7 +49,7 @@ function main(superpixel)
         numSegments = segments(w,h) + 1;
         
     elseif(strcmp(superpixel, 'SLICO'))
-        fid=fopen('SLICO_dat/flowers.dat','rt');
+        fid=fopen(superpixelPath,'rt');
         A = fread(fid,'*uint32');
         fclose(fid);
         segments = reshape(A, h, w)';
@@ -117,7 +119,8 @@ function main(superpixel)
     [new_f1, new_f2] = find(imgMask2(:,:,1) - imgMask2(:,:,2) > 200);
     [new_b1, new_b2] = find(imgMask2(:,:,3) - imgMask2(:,:,2) > 200);
     for i = 1:size(new_f1, 1)
-        if(uSeg(segments(new_f1(i), new_f2(i))+1, 1) ~= 1)
+        if(uSeg(segments(new_f1(i), new_f2(i))+1, 1) ~= 1 && fSeg(segments(new_f1(i), new_f2(i))+1) ~=1 )
+        %if(uSeg(segments(new_f1(i), new_f2(i))+1, 1) ~= 1 )
             uSeg(segments(new_f1(i), new_f2(i))+1, 1) = 1;
             uSeg(segments(new_f1(i), new_f2(i))+1, 2) = 1;
             uSeg(segments(new_f1(i), new_f2(i))+1, 3) = new_f1(i);
@@ -125,7 +128,8 @@ function main(superpixel)
         end
     end
     for i = 1:size(new_b1, 1)
-        if(uSeg(segments(new_b1(i), new_b2(i))+1, 1) ~= 1)
+        if(uSeg(segments(new_b1(i), new_b2(i))+1, 1) ~= 1 && bSeg(segments(new_b1(i), new_b2(i))+1) ~=1 )
+        %if(uSeg(segments(new_b1(i), new_b2(i))+1, 1) ~= 1 )
             uSeg(segments(new_b1(i), new_b2(i))+1, 1) = 1;
             uSeg(segments(new_b1(i), new_b2(i))+1, 2) = 0;
             uSeg(segments(new_b1(i), new_b2(i))+1, 3) = new_b1(i);
