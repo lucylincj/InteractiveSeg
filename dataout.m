@@ -1,11 +1,11 @@
 function dataout(imagefig,varargins)
 % DATAOUT  - This function adds all the stroke points to previous ones
 % Authors - Mohit Gupta, Krishnan Ramnath
-% Affiliation - Robotics Institute, CMU, Pittsburgh
+% Affiliation - Robotics Institute, CMU, Pittsburgh+
 % 2006-05-15
 
 % Global Variables
-global sopt mflag fgflag fgpixels bgpixels editfgpixels editbgpixels;
+global sopt mflag fgflag fgpixels bgpixels editfgpixels editbgpixels fSeg bSeg segments;
 
 % Ignore motion
 set(gcf,'WindowButtonMotionFcn',[]);
@@ -29,7 +29,13 @@ if (mflag == 1)
 elseif(mflag == 0)
     if(fgflag == 1)
         fgpixels = vertcat(fgpixels,coords);
+        for i = 1:size(coords, 1)
+            fSeg(segments(coords(i,2), coords(i,1))+1) = 1;
+        end
     elseif(fgflag == 0)
         bgpixels = vertcat(bgpixels,coords);
+        for i = 1:size(coords, 1)
+            bSeg(segments(coords(i,2), coords(i,1))+1) = 1;
+        end
     end
 end

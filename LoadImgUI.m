@@ -2,7 +2,7 @@ function LoadImgUI
 
 % Global Variables
 % Req by radio button RadioButtonFn
-global hfig longfilename segments numSegments oriImg meanColor;
+global hfig longfilename segments numSegments oriImg meanColor bSeg fSeg;
 
 % Get handle to current figure;
 hfig = gcf;
@@ -62,6 +62,9 @@ drawnow;
         meanColor(3, i) = sum( sum(oriImg(x,y,3)) )/size(x,1);
     end
     
+    fSeg = zeros(1, numSegments);
+    bSeg = zeros(1, numSegments);
+   
     addpath('Bk') ;
     addpath('Bk/bin') ;
 %end

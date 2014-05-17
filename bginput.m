@@ -6,17 +6,11 @@ function  bginput(strg)
 % 2006-05-15
 
     % Global variables referenced in this funciton
-    global fgflag fgbc bgbc fgpixels bgpixels spflag mflag;
+    global fgflag mflag;
     fgflag = 0;
-    if(strcmp(strg,'SLIC'))
-        spflag = 1;
+    if(strcmp(strg,'SNAP'))
         mflag = 0;
-
-    elseif(strcmp(strg,'SLICO'))
-        spflag = 2;
-        mflag = 0;
-
-    elseif(strcmp(strg,'Edit'))
+    elseif(strcmp(strg,'EDIT'))
         mflag = 1;
 
     end

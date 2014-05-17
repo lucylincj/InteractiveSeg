@@ -1,5 +1,5 @@
 function Segment()
-    global sopt fgpixels bgpixels mflag;
+    global sopt fgpixels bgpixels mflag fgflag bSeg fSeg;
     global oriImg segments numSegments editfgpixels editbgpixels meanColor; %for FixEdge
     % GUI specific flag
     fgflag = 2;
@@ -74,23 +74,24 @@ function Segment()
         
         tic
         %initilize forground and background segment
-        fSeg = zeros(1, numSegments);
-        bSeg = zeros(1, numSegments);
+%         fSeg = zeros(1, numSegments);
+%         bSeg = zeros(1, numSegments);
         %[f1, f2] = find(imgMask(:,:,1) - imgMask(:,:,2) > 200);
         %[b1, b2] = find(imgMask(:,:,3) - imgMask(:,:,2) > 200);
+       
         % Get Foreground and Background Pixels
-        FY = fgpixels(:,1);
-        FX = fgpixels(:,2);
-
-        BY = bgpixels(:,1);
-        BX = bgpixels(:,2);
-
-        for i = 1:size(BX, 1)
-            bSeg(segments(BX(i), BY(i))+1) = 1;
-        end
-        for i = 1:size(FX, 1)
-            fSeg(segments(FX(i), FY(i))+1) = 1;
-        end
+%         FY = fgpixels(:,1);
+%         FX = fgpixels(:,2);
+% 
+%         BY = bgpixels(:,1);
+%         BX = bgpixels(:,2);
+% 
+%         for i = 1:size(BX, 1)
+%             bSeg(segments(BX(i), BY(i))+1) = 1;
+%         end
+%         for i = 1:size(FX, 1)
+%             fSeg(segments(FX(i), FY(i))+1) = 1;
+%         end
         uncertain = find((fSeg - bSeg)==0);%this will not be changed
 
         %calculate dF, dB

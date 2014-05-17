@@ -12,7 +12,7 @@ function  fginput(strg)
     % If using the SmartRectangle Function
     if(strcmp(strg,'SNAP'))
         mflag = 0;
-    elseif(strcmp(strg,'Edit'))
+    elseif(strcmp(strg,'EDIT'))
         mflag = 1;
 
     end
