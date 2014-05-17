@@ -6,7 +6,7 @@
 % @author: lucylin
 % @date: 05.2013
 %
-function main(superpixel)
+function main()
     %parameters
     infinite = 999999;
     name = '3_111_111965';
@@ -34,32 +34,32 @@ function main(superpixel)
     %BK_BuildLib; disp('BuildLib PASSED');
     %BK_LoadLib;  disp('LoadLib PASSED');
     
-    if(strcmp(superpixel, 'SLIC'))
-        regionSize = 20 ;
-        regularizer = 10 ; 
-        tic
-        segments = vl_slic(img, regionSize, regularizer, 'verbose') ;
-        toc
-        %save test.dat segments;
-        
-        %show superpixel result
-        [sx,sy]=vl_grad(double(segments), 'type', 'forward') ;
-        s = find(sx | sy) ;
-        imp = img ;
-        imp([s s+numel(img(:,:,1)) s+2*numel(img(:,:,1))]) = 0 ;
-        figure; imagesc(imp) ;
-        %figure; imagesc(segments);
-        numSegments = segments(w,h) + 1;
-        
-    elseif(strcmp(superpixel, 'SLICO'))
+%     if(strcmp(superpixel, 'SLIC'))
+%         regionSize = 20 ;
+%         regularizer = 10 ; 
+%         tic
+%         segments = vl_slic(img, regionSize, regularizer, 'verbose') ;
+%         toc
+%         %save test.dat segments;
+%         
+%         %show superpixel result
+%         [sx,sy]=vl_grad(double(segments), 'type', 'forward') ;
+%         s = find(sx | sy) ;
+%         imp = img ;
+%         imp([s s+numel(img(:,:,1)) s+2*numel(img(:,:,1))]) = 0 ;
+%         figure; imagesc(imp) ;
+%         %figure; imagesc(segments);
+%         numSegments = segments(w,h) + 1;
+%         
+%     elseif(strcmp(superpixel, 'SLICO'))
         fid=fopen(superpixelPath,'rt');
         A = fread(fid,'*uint32');
         fclose(fid);
         segments = reshape(A, h, w)';
         numSegments = max(A) + 1;
         %//////////////////////////////////////////////////////////////%
-    end
-    tic
+%     end
+
     %compute mean color of each segment
     mC = zeros(3, numSegments);
 
@@ -83,27 +83,15 @@ function main(superpixel)
         bSeg(segments(b1(i), b2(i))+1) = 1;
     end
     uncertain = find((fSeg - bSeg)==0);%this will not be changed
-
+    
+    tic
     %calculate dF, dB
-
     [dF dB] = updateMinDis(uncertain, numSegments, mC, fSeg, bSeg);
     toc
-
+   
+    tic 
     %distinguish neighbors
-    tic
     neighboring = FindNeighbor(segments, numSegments);
-%     neighboring = zeros(numSegments, numSegments);
-%     seg2 = [0 1 0; 1 1 1; 0 1 0];
-%     for i = 1:numSegments
-%         seg1 = zeros(w, h);
-%         seg1(segments==i-1) = 1;
-%         x = 0; y = 0;
-%         result = imdilate(seg1, seg2) - seg1;
-%         [x, y] = find(result==1);
-%         for k = 1:size(x, 1)
-%             neighboring(i, segments(x, y)+1) = 1;
-%         end
-%     end
     toc
     
     tic
@@ -118,11 +106,11 @@ function main(superpixel)
     BK_SetNeighbors(hinc, E2);
     e_inc = BK_Minimize(hinc);
     lab = BK_GetLabeling(hinc);
-
-    map = drawResults(oriImg, segments, lab);
-
     BK_Delete(hinc);
-
+    toc
+    
+    tic
+    map = drawResults(oriImg, segments, lab);
     toc
     
     %///////////////////////STEP 2/////////////////////////////%
