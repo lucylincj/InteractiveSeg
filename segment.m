@@ -95,7 +95,7 @@ function Segment()
         uncertain = find((fSeg - bSeg)==0);%this will not be changed
 
         %calculate dF, dB
-        [dF dB] = updateMinDis(uncertain, numSegments, meanColor, fSeg, bSeg);
+        [dF dB] = updateMinDis(uncertain);
         toc
 
        
@@ -120,8 +120,7 @@ function Segment()
         BK_Delete(hinc); %reslease memory
         toc
         
-        drawResults(oriImg, segments, lab);
-        
+        drawResults(lab);
     end
 
 end
