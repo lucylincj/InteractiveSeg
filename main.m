@@ -9,11 +9,12 @@
 function main(superpixel)
     %parameters
     infinite = 999999;
+    name = '3_111_111965';
     path = 'D:/InteractiveSegTestImage/';
-    imgPath = [path, '2_89_89895.jpg'];
-    superpixelPath = [path, 'SLICO_dat/2_89_89895.dat'];
-    maskPath = [path, 'mask1/2_89_89895_mask1.jpg'];
-    maskPath2 = [path, 'mask2/2_89_89895_mask2.jpg'];
+    imgPath = [path, name, '.jpg'];
+    superpixelPath = [path, 'SLICO_dat/', name, '.dat'];
+    maskPath = [path, 'mask1/', name, '_mask1.jpg'];
+    maskPath2 = [path, 'mask2/', name, '_mask2.jpg'];
     
     %add necessary path
     addpath('Bk') ;
@@ -35,8 +36,10 @@ function main(superpixel)
     
     if(strcmp(superpixel, 'SLIC'))
         regionSize = 20 ;
-        regularizer = 5 ; 
+        regularizer = 10 ; 
+        tic
         segments = vl_slic(img, regionSize, regularizer, 'verbose') ;
+        toc
         %save test.dat segments;
         
         %show superpixel result
@@ -89,6 +92,18 @@ function main(superpixel)
     %distinguish neighbors
     tic
     neighboring = FindNeighbor(segments, numSegments);
+%     neighboring = zeros(numSegments, numSegments);
+%     seg2 = [0 1 0; 1 1 1; 0 1 0];
+%     for i = 1:numSegments
+%         seg1 = zeros(w, h);
+%         seg1(segments==i-1) = 1;
+%         x = 0; y = 0;
+%         result = imdilate(seg1, seg2) - seg1;
+%         [x, y] = find(result==1);
+%         for k = 1:size(x, 1)
+%             neighboring(i, segments(x, y)+1) = 1;
+%         end
+%     end
     toc
     
     tic
@@ -120,7 +135,6 @@ function main(superpixel)
     [new_b1, new_b2] = find(imgMask2(:,:,3) - imgMask2(:,:,2) > 200);
     for i = 1:size(new_f1, 1)
         if(uSeg(segments(new_f1(i), new_f2(i))+1, 1) ~= 1 && fSeg(segments(new_f1(i), new_f2(i))+1) ~=1 )
-        %if(uSeg(segments(new_f1(i), new_f2(i))+1, 1) ~= 1 )
             uSeg(segments(new_f1(i), new_f2(i))+1, 1) = 1;
             uSeg(segments(new_f1(i), new_f2(i))+1, 2) = 1;
             uSeg(segments(new_f1(i), new_f2(i))+1, 3) = new_f1(i);
@@ -129,7 +143,6 @@ function main(superpixel)
     end
     for i = 1:size(new_b1, 1)
         if(uSeg(segments(new_b1(i), new_b2(i))+1, 1) ~= 1 && bSeg(segments(new_b1(i), new_b2(i))+1) ~=1 )
-        %if(uSeg(segments(new_b1(i), new_b2(i))+1, 1) ~= 1 )
             uSeg(segments(new_b1(i), new_b2(i))+1, 1) = 1;
             uSeg(segments(new_b1(i), new_b2(i))+1, 2) = 0;
             uSeg(segments(new_b1(i), new_b2(i))+1, 3) = new_b1(i);
@@ -155,10 +168,6 @@ function main(superpixel)
     resultImg(:, :, 3)  = oriImg(:, :, 3) .* uint8(map);
 
     figure; imshow(resultImg);
-    % flowers 347 355 (segments label)
-    % horse 351   365   366   386
-    % [idx, M] = testBranch(oriImg, segments, 365);
-    % drawFineResults(oriImg, segments, lab, idx, M, 365);
 
 end
   

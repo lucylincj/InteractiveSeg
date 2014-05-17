@@ -8,8 +8,8 @@ function E1 = updateE1(numSegments, fSeg, bSeg, dF, dB, infinite)
             E1(1, i) = infinite;
             E1(2, i) = 0;
         else
-            E1(1, i) = dB(i) / (dF(i) + dF(i));
-            E1(2, i) = dF(i) / (dF(i) + dF(i));
+            E1(1, i) = dB(i) / (dF(i) + dB(i));
+            E1(2, i) = dF(i) / (dF(i) + dB(i));
         end
     end
     

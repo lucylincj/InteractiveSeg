@@ -7,15 +7,10 @@ function  fginput(strg)
 
 
     % Global variables referenced in this funciton
-    global sopt fgflag fgpixels bgpixels spflag mflag;
+    global fgflag mflag;
     fgflag = 1;
     % If using the SmartRectangle Function
-    if(strcmp(strg,'SLIC'))
-        spflag = 1;
-        mflag = 0;
-
-    elseif(strcmp(strg,'SLICO'))
-        spflag = 2;
+    if(strcmp(strg,'SNAP'))
         mflag = 0;
     elseif(strcmp(strg,'Edit'))
         mflag = 1;

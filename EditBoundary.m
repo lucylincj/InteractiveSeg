@@ -1,5 +1,3 @@
-% tmp
-% flowers doubleMarked resion: 348 381
 function EditBoundary(oriImg, segments, lab, editfgpixels, editbgpixels)
     sizef = size(editfgpixels, 1);
     sizeb = size(editbgpixels, 1);

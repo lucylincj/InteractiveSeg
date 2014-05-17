@@ -3,7 +3,7 @@ function RadioButtonFn(source, eventdata)
 % choice of radio button
 
 % Global Variables
-global hfig longfilename;
+global hfig meanColor;
 
 % Pass string value to seed selection function
 strg = get(eventdata.NewValue,'String');
@@ -19,7 +19,7 @@ data.ui.push_bg = uicontrol(hfig, 'Style','pushbutton', 'Units', 'Normalized','P
 
 % Calls Segment - graph-cuts on the image
 data.ui.push_bg = uicontrol(hfig, 'Style','pushbutton', 'Units', 'Normalized','Position',[.7 .4 .1 .05], ...
-    'String','Graph Cuts','Callback', ['Segment ',longfilename]);
+    'String','Graph Cuts','Callback', ['Segment ']);
 drawnow;
 
 end

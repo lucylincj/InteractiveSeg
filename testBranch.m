@@ -34,8 +34,8 @@ function [idx, mask] = testBranch(oriImg, segments, num, info)
     % repeat the clustering 3 times to avoid local minima
     %[cluster_idx, cluster_center] = kmeans(ab,nColors,'distance','sqEuclidean', ...
     %                                      'Replicates',3);
-    addpath(genpath('vlfeat-0.9.18')) ;
-    vl_setup();
+%     addpath(genpath('vlfeat-0.9.18')) ;
+%     vl_setup();
     
     [idx_, C_, e] = vl_kmeans(ab, nColors,'distance', 'l1') ;
     mask = reshape(C_, nrows, ncols);
