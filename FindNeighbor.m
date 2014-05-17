@@ -1,4 +1,5 @@
-function adj = FindNeighbor(segments, numSegments)
+function adj = FindNeighbor()
+    global segments numSegments;
     [w, h] = size(segments);
     adj=eye(numSegments);
     hseg=segments(:,[2:h,h]);

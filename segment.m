@@ -101,13 +101,13 @@ function Segment()
        
         tic
         %distinguish neighbors
-        neighboring = FindNeighbor(segments, numSegments);
+        neighboring = FindNeighbor();
         toc
 
         tic
         %compute E1 E2
-        E1 = updateE1(numSegments, fSeg, bSeg, dF, dB, infinite);
-        E2 = updateE2(numSegments, fSeg, bSeg, neighboring, meanColor) ;
+        E1 = updateE1(dF, dB, infinite);
+        E2 = updateE2(neighboring) ;
         toc
 
         tic

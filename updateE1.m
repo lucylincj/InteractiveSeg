@@ -1,4 +1,5 @@
-function E1 = updateE1(numSegments, fSeg, bSeg, dF, dB, infinite)
+function E1 = updateE1(dF, dB, infinite)
+    global numSegments fSeg bSeg;
     E1 = zeros(2, numSegments);
     for i = 1:numSegments
         if ( bSeg(i) == 1 )%background
