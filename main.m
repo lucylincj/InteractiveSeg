@@ -6,13 +6,13 @@
 % @author: lucylin
 % @date: 05.2013
 %
-function main()
+function main(name)
     global oriImg numSegments meanColor meanCoord fSeg bSeg segments;
     %parameters
     infinite = 999999;
-    name = '0_15_15742';
+    %name = '0_15_15742';
     path = 'D:/InteractiveSegTestImage/';
-    imgPath = [path, name, '.jpg'];
+    imgPath = strcat(path, name, '.jpg');
     superpixelPath = [path, 'SLICO_dat/', name, '.dat'];
     maskPath = [path, 'mask1/', name, '_mask1.jpg'];
     maskPath2 = [path, 'mask2/', name, '_mask2.jpg'];
