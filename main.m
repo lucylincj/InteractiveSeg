@@ -7,9 +7,10 @@
 % @date: 05.2013
 %
 function main()
+    global oriImg numSegments meanColor meanCoord fSeg bSeg segments;
     %parameters
     infinite = 999999;
-    name = '3_111_111965';
+    name = '0_15_15742';
     path = 'D:/InteractiveSegTestImage/';
     imgPath = [path, name, '.jpg'];
     superpixelPath = [path, 'SLICO_dat/', name, '.dat'];
@@ -61,13 +62,16 @@ function main()
 %     end
 
     %compute mean color of each segment
-    mC = zeros(3, numSegments);
+    meanColor = zeros(3, numSegments);
+    meanCoord = zeros(2, numSegments);
 
     for i = 1:numSegments
         [x,y] = find(segments==i-1);
-        mC(1, i) = sum( sum(img(x,y,1)) )/size(x,1);
-        mC(2, i) = sum( sum(img(x,y,2)) )/size(x,1);
-        mC(3, i) = sum( sum(img(x,y,3)) )/size(x,1);
+        meanColor(1, i) = sum( sum(img(x,y,1)) )/size(x,1);
+        meanColor(2, i) = sum( sum(img(x,y,2)) )/size(x,1);
+        meanColor(3, i) = sum( sum(img(x,y,3)) )/size(x,1);
+        meanCoord(1, i) = sum(x)/size(x,1);
+        meanCoord(2, i) = sum(y)/size(y,1);
     end
 
 
@@ -86,18 +90,18 @@ function main()
     
     tic
     %calculate dF, dB
-    [dF dB] = updateMinDis(uncertain, numSegments, mC, fSeg, bSeg);
+    [dF dB] = updateMinDis(uncertain);
     toc
    
     tic 
     %distinguish neighbors
-    neighboring = FindNeighbor(segments, numSegments);
+    neighboring = FindNeighbor();
     toc
     
     tic
     %compute E1 E2
-    E1 = updateE1(numSegments, fSeg, bSeg, dF, dB, infinite);
-    E2 = updateE2(numSegments, fSeg, bSeg, neighboring, mC) ;
+    E1 = updateE1(dF, dB, infinite);
+    E2 = updateE2(neighboring) ;
     toc
 
     tic
@@ -109,53 +113,53 @@ function main()
     BK_Delete(hinc);
     toc
     
-    tic
-    map = drawResults(oriImg, segments, lab);
-    toc
+    
+    map = drawResults(lab);
+    
     
     %///////////////////////STEP 2/////////////////////////////%
     %load mask 2
-    imgMask2 = imread(maskPath2);
-    
-    %identify ambiguous segments
-    uSeg = zeros(numSegments, 4);
-    [new_f1, new_f2] = find(imgMask2(:,:,1) - imgMask2(:,:,2) > 200);
-    [new_b1, new_b2] = find(imgMask2(:,:,3) - imgMask2(:,:,2) > 200);
-    for i = 1:size(new_f1, 1)
-        if(uSeg(segments(new_f1(i), new_f2(i))+1, 1) ~= 1 && fSeg(segments(new_f1(i), new_f2(i))+1) ~=1 )
-            uSeg(segments(new_f1(i), new_f2(i))+1, 1) = 1;
-            uSeg(segments(new_f1(i), new_f2(i))+1, 2) = 1;
-            uSeg(segments(new_f1(i), new_f2(i))+1, 3) = new_f1(i);
-            uSeg(segments(new_f1(i), new_f2(i))+1, 4) = new_f2(i);
-        end
-    end
-    for i = 1:size(new_b1, 1)
-        if(uSeg(segments(new_b1(i), new_b2(i))+1, 1) ~= 1 && bSeg(segments(new_b1(i), new_b2(i))+1) ~=1 )
-            uSeg(segments(new_b1(i), new_b2(i))+1, 1) = 1;
-            uSeg(segments(new_b1(i), new_b2(i))+1, 2) = 0;
-            uSeg(segments(new_b1(i), new_b2(i))+1, 3) = new_b1(i);
-            uSeg(segments(new_b1(i), new_b2(i))+1, 4) = new_b2(i);
-        end
-    end
-    
-    seg = find(uSeg(:,1)==1);
-    
-    for i = 1:size(seg, 1)
-        [idx, M] = testBranch(oriImg, segments, seg(i)-1, uSeg(seg(i),:));
-        map(idx(1):idx(2), idx(3):idx(4)) = M;
-        %drawFineResults(oriImg, segments, lab, idx, M, seg(i)-1);
-    end
-    %restore other segments
-    for i = 1:numSegments
-        if(uSeg(i, 1) ~= 1)
-            map(segments==i-1) = lab(i) -1;
-        end
-    end
-    resultImg(:, :, 1)  = oriImg(:, :, 1) .* uint8(map);
-    resultImg(:, :, 2)  = oriImg(:, :, 2) .* uint8(map);
-    resultImg(:, :, 3)  = oriImg(:, :, 3) .* uint8(map);
-
-    figure; imshow(resultImg);
+%     imgMask2 = imread(maskPath2);
+%     
+%     %identify ambiguous segments
+%     uSeg = zeros(numSegments, 4);
+%     [new_f1, new_f2] = find(imgMask2(:,:,1) - imgMask2(:,:,2) > 200);
+%     [new_b1, new_b2] = find(imgMask2(:,:,3) - imgMask2(:,:,2) > 200);
+%     for i = 1:size(new_f1, 1)
+%         if(uSeg(segments(new_f1(i), new_f2(i))+1, 1) ~= 1 && fSeg(segments(new_f1(i), new_f2(i))+1) ~=1 )
+%             uSeg(segments(new_f1(i), new_f2(i))+1, 1) = 1;
+%             uSeg(segments(new_f1(i), new_f2(i))+1, 2) = 1;
+%             uSeg(segments(new_f1(i), new_f2(i))+1, 3) = new_f1(i);
+%             uSeg(segments(new_f1(i), new_f2(i))+1, 4) = new_f2(i);
+%         end
+%     end
+%     for i = 1:size(new_b1, 1)
+%         if(uSeg(segments(new_b1(i), new_b2(i))+1, 1) ~= 1 && bSeg(segments(new_b1(i), new_b2(i))+1) ~=1 )
+%             uSeg(segments(new_b1(i), new_b2(i))+1, 1) = 1;
+%             uSeg(segments(new_b1(i), new_b2(i))+1, 2) = 0;
+%             uSeg(segments(new_b1(i), new_b2(i))+1, 3) = new_b1(i);
+%             uSeg(segments(new_b1(i), new_b2(i))+1, 4) = new_b2(i);
+%         end
+%     end
+%     
+%     seg = find(uSeg(:,1)==1);
+%     
+%     for i = 1:size(seg, 1)
+%         [idx, M] = testBranch(oriImg, segments, seg(i)-1, uSeg(seg(i),:));
+%         map(idx(1):idx(2), idx(3):idx(4)) = M;
+%         %drawFineResults(oriImg, segments, lab, idx, M, seg(i)-1);
+%     end
+%     %restore other segments
+%     for i = 1:numSegments
+%         if(uSeg(i, 1) ~= 1)
+%             map(segments==i-1) = lab(i) -1;
+%         end
+%     end
+%     resultImg(:, :, 1)  = oriImg(:, :, 1) .* uint8(map);
+%     resultImg(:, :, 2)  = oriImg(:, :, 2) .* uint8(map);
+%     resultImg(:, :, 3)  = oriImg(:, :, 3) .* uint8(map);
+% 
+%     figure; imshow(resultImg);
 
 end
   

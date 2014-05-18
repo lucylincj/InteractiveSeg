@@ -2,7 +2,7 @@ function LoadImgUI
 
 % Global Variables
 % Req by radio button RadioButtonFn
-global hfig longfilename segments numSegments oriImg meanColor bSeg fSeg;
+global hfig longfilename segments numSegments oriImg meanColor meanCoord bSeg fSeg;
 
 % Get handle to current figure;
 hfig = gcf;
@@ -54,14 +54,19 @@ drawnow;
     numSegments = max(A) + 1;
     disp('superpixel done');
     
+    %calculate mean color, mean coordinate of every segment
     meanColor = zeros(3, numSegments);
+    meanCoord = zeros(2, numSegments);
     for i = 1:numSegments
         [x,y] = find(segments==i-1);
         meanColor(1, i) = sum( sum(oriImg(x,y,1)) )/size(x,1);
         meanColor(2, i) = sum( sum(oriImg(x,y,2)) )/size(x,1);
         meanColor(3, i) = sum( sum(oriImg(x,y,3)) )/size(x,1);
+        meanCoord(1, i) = sum(x)/size(x,1);
+        meanCoord(2, i) = sum(y)/size(y,1);
     end
     
+    %initialize fSeg and bSeg
     fSeg = zeros(1, numSegments);
     bSeg = zeros(1, numSegments);
    
