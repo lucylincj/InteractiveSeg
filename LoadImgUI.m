@@ -46,7 +46,7 @@ drawnow;
 %     segments = vl_slic(img, regionSize, regularizer, 'verbose') ;
 %     numSegments = segments(end,end) + 1;
 %elseif(strcmp(strg,'SLICO'))
-    fid=fopen([pathname,'SLICO_dat/', filename(1:end-4),'.dat'],'rt');
+    fid=fopen([pathname,'SLICO/370/', filename(1:end-4),'.dat'],'rt');
     A = fread(fid,'*uint32');
     fclose(fid);
     [w, h, dummy] = size(oriImg) ;

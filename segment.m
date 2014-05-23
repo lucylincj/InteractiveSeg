@@ -1,6 +1,5 @@
 function Segment()
-    global sopt fgpixels bgpixels mflag fgflag bSeg fSeg;
-    global oriImg segments numSegments editfgpixels editbgpixels meanColor; %for FixEdge
+    global mflag fgflag bSeg fSeg numSegments;
     % GUI specific flag
     fgflag = 2;
     
