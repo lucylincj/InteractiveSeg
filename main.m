@@ -13,7 +13,7 @@ function main(name)
     %name = '0_15_15742';
     path = 'D:/InteractiveSegTestImage/';
     imgPath = strcat(path, name, '.jpg');
-    superpixelPath = [path, 'SLICO/370/', name, '.dat'];
+    superpixelPath = [path, 'SLICO/300/', name, '.dat'];
     maskPath = [path, 'mask1/', name, '_mask1.jpg'];
     maskPath2 = [path, 'mask2/', name, '_mask2.jpg'];
     
@@ -53,22 +53,25 @@ function main(name)
 %         numSegments = segments(w,h) + 1;
 %         
 %     elseif(strcmp(superpixel, 'SLICO'))
-%         fid=fopen(superpixelPath,'rt');
-%         A = fread(fid,'*uint32');
-%         fclose(fid);
-%         segments = reshape(A, h, w)';
-%         numSegments = max(A) + 1;
+        fid=fopen(superpixelPath,'rt');
+        A = fread(fid,'*uint32');
+        fclose(fid);
+        segments = reshape(A, h, w)';
+        numSegments = max(A) + 1;
         %//////////////////////////////////////////////////////////////%
 %     end
 
     %//////////////////ERS/////////////////////////////////////////////%
-    grey_img = double(rgb2gray(oriImg));
-    nC = floor(w*h/370);
-    t = cputime;
-    [segments] = mex_ers(grey_img,nC);
-    numSegments = max(max(segments)) + 1;
-    fprintf(1,'Use %f sec. \n',cputime-t);
-    fprintf(1,'\t to divide the image into %d superpixels.\n',nC);
+%     grey_img = double(rgb2gray(oriImg));
+%     nC = floor(w*h/370);
+%     t = cputime;
+%     [segments] = mex_ers(grey_img,nC);
+%     numSegments = max(max(segments)) + 1;
+%     fprintf(1,'Use %f sec. \n',cputime-t);
+%     fprintf(1,'\t to divide the image into %d superpixels.\n',nC);
+    
+    %//////////////////////////////////////////////////////////////////%
+    
     %compute mean color of each segment
     meanColor = zeros(3, numSegments);
     meanCoord = zeros(2, numSegments);
@@ -123,7 +126,7 @@ function main(name)
     
     
     newImg = drawResults(lab);
-    %imwrite(newImg, [path, 'testResult2/ERS370/',name,'.jpg']);
+    imwrite(newImg, [path, 'result/300/',name,'.jpg']);
     
     %///////////////////////STEP 2/////////////////////////////%
     %load mask 2
