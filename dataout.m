@@ -5,7 +5,7 @@ function dataout(imagefig,varargins)
 % 2006-05-15
 
 % Global Variables
-global sopt mflag fgflag fgpixels bgpixels editfgpixels editbgpixels fSeg bSeg segments;
+global sopt mflag fgflag fgpixels bgpixels editfgpixels editbgpixels fSeg bSeg segments scaleMap radientPatch;
 
 % Ignore motion
 set(gcf,'WindowButtonMotionFcn',[]);
@@ -30,7 +30,15 @@ elseif(mflag == 0)
     if(fgflag == 1)
         fgpixels = vertcat(fgpixels,coords);
         for i = 1:size(coords, 1)
-            fSeg(segments(coords(i,2), coords(i,1))+1) = 1;
+            if(fSeg(segments(coords(i,2), coords(i,1))+1) ~= 1)
+                fSeg(segments(coords(i,2), coords(i,1))+1) = 1;
+%                 x = meanCoord(segments(coords(i,2), coords(i,1))+1, 1);
+%                 y = meanCoord(segments(coords(i,2), coords(i,1))+1, 2);
+%                 up = 
+%                 down = 
+%                 right = 
+%                 left =                 
+            end
         end
     elseif(fgflag == 0)
         bgpixels = vertcat(bgpixels,coords);

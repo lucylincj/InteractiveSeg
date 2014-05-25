@@ -11,5 +11,5 @@ function img = drawResults(result)
     map = repmat(map,[1,1,3]);
     img  = oriImg .* uint8(map);
     toc
-    figure; imshow(img);
+    %figure; imshow(img);
 end

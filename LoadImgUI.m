@@ -2,7 +2,8 @@ function LoadImgUI
 
 % Global Variables
 % Req by radio button RadioButtonFn
-global hfig longfilename segments numSegments oriImg meanColor meanCoord bSeg fSeg;
+global hfig longfilename segments numSegments oriImg meanColor meanCoord bSeg fSeg neighboring colorDis;
+%global radientPatch scaleMap;
 
 % Get handle to current figure;
 hfig = gcf;
@@ -46,7 +47,7 @@ drawnow;
 %     segments = vl_slic(img, regionSize, regularizer, 'verbose') ;
 %     numSegments = segments(end,end) + 1;
 %elseif(strcmp(strg,'SLICO'))
-    fid=fopen([pathname,'SLICO/370/', filename(1:end-4),'.dat'],'rt');
+    fid=fopen([pathname,'SLICO/300/', filename(1:end-4),'.dat'],'rt');
     A = fread(fid,'*uint32');
     fclose(fid);
     [w, h, dummy] = size(oriImg) ;
@@ -66,9 +67,20 @@ drawnow;
         meanCoord(2, i) = sum(y)/size(y,1);
     end
     
+    %generate radient patch
+%     r = floor(min(w,h)/4);
+%     tmp = fliplr(1:r)'*(1:r)/r/r;
+%     radientPatch = [fliplr(tmp), tmp ; tmp', flipud(tmp)];
+%     scaleMap = ones(size(segments));
+    
+    
     %initialize fSeg and bSeg
     fSeg = zeros(1, numSegments);
     bSeg = zeros(1, numSegments);
+    
+    %find neighbors
+    neighboring = FindNeighbor();
+    colorDis = pdist2(meanColor', meanColor').*neighboring;
    
     addpath('Bk') ;
     addpath('Bk/bin') ;

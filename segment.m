@@ -1,5 +1,5 @@
 function Segment()
-    global mflag fgflag bSeg fSeg numSegments;
+    global mflag fgflag bSeg fSeg numSegments scaleMap radientPatch;
     % GUI specific flag
     fgflag = 2;
     
@@ -92,6 +92,9 @@ function Segment()
 %             fSeg(segments(FX(i), FY(i))+1) = 1;
 %         end
         uncertain = find((fSeg - bSeg)==0);%this will not be changed
+        
+        %scaleMap
+        
 
         %calculate dF, dB
         [dF dB] = updateMinDis(uncertain);

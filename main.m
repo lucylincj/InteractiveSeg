@@ -6,8 +6,8 @@
 % @author: lucylin
 % @date: 05.2013
 %
-function main(name)
-    global oriImg numSegments meanColor meanCoord fSeg bSeg segments;
+function main(name, param1, lambda)
+    global oriImg numSegments meanColor meanCoord fSeg bSeg segments colorDis;
     %parameters
     infinite = 999999;
     %name = '0_15_15742';
@@ -107,12 +107,13 @@ function main(name)
     tic 
     %distinguish neighbors
     neighboring = FindNeighbor();
+    colorDis = pdist2(meanColor', meanColor').*neighboring;
     toc
     
     tic
     %compute E1 E2
     E1 = updateE1(dF, dB, infinite);
-    E2 = updateE2(neighboring) ;
+    E2 = updateE2(neighboring, param1, lambda) ;
     toc
 
     tic
@@ -126,7 +127,9 @@ function main(name)
     
     
     newImg = drawResults(lab);
-    imwrite(newImg, [path, 'result/300/',name,'.jpg']);
+    dir = [path, 'result/SLICO/300/Cr/3_5/lambda1/'];
+    if (exist(dir, 'dir') == 0), mkdir(dir); end
+    imwrite(newImg, [dir,name,'.jpg']);
     
     %///////////////////////STEP 2/////////////////////////////%
     %load mask 2
