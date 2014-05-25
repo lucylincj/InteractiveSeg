@@ -6,7 +6,7 @@
 % @author: lucylin
 % @date: 05.2013
 %
-function main(name, param1, lambda)
+function main(name, lambda)
     global oriImg numSegments meanColor meanCoord fSeg bSeg segments colorDis;
     %parameters
     infinite = 999999;
@@ -63,7 +63,7 @@ function main(name, param1, lambda)
 
     %//////////////////ERS/////////////////////////////////////////////%
 %     grey_img = double(rgb2gray(oriImg));
-%     nC = floor(w*h/370);
+%     nC = floor(w*h/300);
 %     t = cputime;
 %     [segments] = mex_ers(grey_img,nC);
 %     numSegments = max(max(segments)) + 1;
@@ -113,7 +113,7 @@ function main(name, param1, lambda)
     tic
     %compute E1 E2
     E1 = updateE1(dF, dB, infinite);
-    E2 = updateE2(neighboring, param1, lambda) ;
+    E2 = updateE2(neighboring, lambda) ;
     toc
 
     tic
@@ -127,7 +127,8 @@ function main(name, param1, lambda)
     
     
     newImg = drawResults(lab);
-    dir = [path, 'result/SLICO/300/Cr/3_5/lambda1/'];
+%     dir = [path, 'result/SLICO/300/Cr/dis/L1/', int2str(param11),'_', int2str(param12),'/',int2str(lambda),'/'];
+    dir = [path, 'result/SLICO/300/', int2str(lambda),'/'];
     if (exist(dir, 'dir') == 0), mkdir(dir); end
     imwrite(newImg, [dir,name,'.jpg']);
     
