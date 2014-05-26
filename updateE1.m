@@ -1,3 +1,4 @@
+%function E1 = updateE1(dF, dB, dTF, dTB, infinite)
 function E1 = updateE1(dF, dB, infinite)
     global numSegments fSeg bSeg;
     E1 = zeros(2, numSegments);
@@ -9,6 +10,8 @@ function E1 = updateE1(dF, dB, infinite)
             E1(1, i) = infinite;
             E1(2, i) = 0;
         else
+            % E1(1, i) = dB(i) / (dF(i) + dB(i)) + dTB(i) / (dTF(i) + dTB(i));
+            % E1(2, i) = dF(i) / (dF(i) + dB(i)) + dTF(i) / (dTF(i) + dTB(i));
             E1(1, i) = dB(i) / (dF(i) + dB(i));
             E1(2, i) = dF(i) / (dF(i) + dB(i));
         end

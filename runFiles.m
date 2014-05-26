@@ -9,20 +9,24 @@ function runFiles(listName)
              3, 5;
              4, 5];
 %     for i = 1:N
-%         for j = 1:size(param, 1)
-%             for k = 1:size(lambda, 2)
-%                 main(fileName{i}, param(j, 1), param(j, 2), lambda(k));
-%                 %imsave([tarPath,name,'.jpg']);
-%                 disp([fileName{i}, ' ', 'OK!']);
-%             end
-%         end
+%         runERS(fileName{i}, 300);
 %     end
-    
+
     for i = 1:N
-        for k = 1:size(lambda, 2)
-            main(fileName{i}, lambda(k));
-            %imsave([tarPath,name,'.jpg']);
-            disp([fileName{i}, ' ', 'OK!']);
+        for j = 1:size(param, 1)
+            for k = 1:size(lambda, 2)
+                main(fileName{i}, param(j, 1), param(j, 2), lambda(k));
+                %imsave([tarPath,name,'.jpg']);
+                disp([fileName{i}, ' ', 'OK!']);
+            end
         end
     end
+    
+%     for i = 1:N
+%         for k = 1:size(lambda, 2)
+%             main(fileName{i}, lambda(k));
+%             %imsave([tarPath,name,'.jpg']);
+%             disp([fileName{i}, ' ', 'OK!']);
+%         end
+%     end
 end

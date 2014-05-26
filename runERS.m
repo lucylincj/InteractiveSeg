@@ -13,6 +13,7 @@ function runERS(name, nC)
     %%
     %/////////////////////////segmentation////////////////////////////////
     t = cputime;
+    nC = size(grey_img, 1) * size(grey_img, 2) / nC;
     [labels] = mex_ers(grey_img,nC);
     fprintf(1,'Use %f sec. \n',cputime-t);
     fprintf(1,'\t to divide the image into %d superpixels.\n',nC);
@@ -47,12 +48,13 @@ function runERS(name, nC)
     displayImg(:,:,1) = layerR;
     displayImg(:,:,2) = layerG;
     displayImg(:,:,3) = layerB;
-    figure; imshow(displayImg);
-    figure; imshow(grey_img,[]);
+    imwrite(displayImg, [path, 'ERS/', name, '.png']);
+    %figure; imshow(displayImg);
+    %figure; imshow(grey_img,[]);
 
     %// Randomly color the superpixels
-    [out] = random_color( double(img) ,labels,nC);
-    figure; imshow(out, []);
+    %[out] = random_color( double(img) ,labels,nC);
+    %figure; imshow(out, []);
 % 
 %     %// Compute the superpixel size histogram.
 %     siz = zeros(nC,1);

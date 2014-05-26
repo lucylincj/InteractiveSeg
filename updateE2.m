@@ -1,11 +1,12 @@
-function newE2 = updateE2(neighboring, lambda)
+function newE2 = updateE2(neighboring, param11, param12, lambda)
+% function newE2 = updateE2(neighboring, lambda)
     global numSegments fSeg bSeg meanColor meanCoord colorDis ; 
     newE2 = zeros(numSegments, numSegments);
     [pair1, pair2] = find(triu(neighboring, 1)==1);
-    %addUpDis = sum(colorDis, 2);
-    %param1 = 3/5;
-    %param1 = param11 / param12;
-    %param2 = 1-param1;
+    addUpDis = sum(colorDis, 2);
+    nNeighbor = sum(neighboring, 2)/2;
+    param1 = param11 / param12;
+    param2 = 1-param1;
     for i = 1:size(pair1, 1)
         n1 = pair1(i);
         n2 = pair2(i);
@@ -15,10 +16,12 @@ function newE2 = updateE2(neighboring, lambda)
             % C =  (meanColor(:, n1) - meanColor(:, n2))' * (meanColor(:, n1) - meanColor(:, n2));
             C = colorDis(n1, n2);
             % C = sum(meanColor(:, n1) - meanColor(:, n2));
-            % Cr = (addUpDis(n1) + addUpDis(n2)) * param2;
+            Cr = (addUpDis(n1) + addUpDis(n2)) / (nNeighbor(n1) + nNeighbor(n2));
             % C = param1 * C;
-            % newE2(n1, n2) = 1 / (C + Cr) + sqrt((meanCoord(1, n1) - meanCoord(1, n2)).^2 + (meanCoord(2, n1) - meanCoord(2, n2)).^2);
-            newE2(n1, n2) = 1 / (1 + C^2) * sqrt((meanCoord(1, n1) - meanCoord(1, n2)).^2 + (meanCoord(2, n1) - meanCoord(2, n2)).^2);
+            % newE2(n1, n2) = 1 / (C^2 + 1) * sqrt((meanCoord(1, n1) - meanCoord(1, n2)).^2 + (meanCoord(2, n1) - meanCoord(2, n2)).^2);
+            % ver1
+            newE2(n1, n2) = 1 / (1 + C^2 * param1 + Cr^2 * param2)...
+                * sqrt((meanCoord(1, n1) - meanCoord(1, n2)).^2 + (meanCoord(2, n1) - meanCoord(2, n2)).^2);
             %newE2(n1, n2) = 1 / (1 + C);
         end
     end

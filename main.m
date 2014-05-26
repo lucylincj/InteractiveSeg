@@ -3,11 +3,13 @@
 % already blocked the interactive part
 % please change paths to load in different image set (line 12-14)
 % @parameter: input'SLIC' or 'SLICO'
-% @author: lucylin
+% @author: r01942054@ntu
 % @date: 05.2013
 %
-function main(name, lambda)
-    global oriImg numSegments meanColor meanCoord fSeg bSeg segments colorDis;
+function main(name, param11, param12, lambda)
+%function main(name, lambda)
+    global oriImg numSegments meanColor meanCoord fSeg bSeg segments colorDis meanTexture;
+    warning off;
     %parameters
     infinite = 999999;
     %name = '0_15_15742';
@@ -75,14 +77,32 @@ function main(name, lambda)
     %compute mean color of each segment
     meanColor = zeros(3, numSegments);
     meanCoord = zeros(2, numSegments);
-
+    texture = extractTexture(rgb2gray(oriImg));
+    meanTexture = zeros(16, numSegments);
     for i = 1:numSegments
         [x,y] = find(segments==i-1);
-        meanColor(1, i) = sum( sum(img(x,y,1)) )/size(x,1);
-        meanColor(2, i) = sum( sum(img(x,y,2)) )/size(x,1);
-        meanColor(3, i) = sum( sum(img(x,y,3)) )/size(x,1);
-        meanCoord(1, i) = sum(x)/size(x,1);
-        meanCoord(2, i) = sum(y)/size(y,1);
+        sz = size(x, 1);
+        meanColor(1, i) = sum( sum(img(x,y,1)) )/sz;
+        meanColor(2, i) = sum( sum(img(x,y,2)) )/sz;
+        meanColor(3, i) = sum( sum(img(x,y,3)) )/sz;
+        meanCoord(1, i) = sum(x)/sz;
+        meanCoord(2, i) = sum(y)/sz;
+%         meanTexture(1, i) = sum(texture(1, segments==i-1))/sz;
+%         meanTexture(2, i) = sum(texture(2, segments==i-1))/sz;
+%         meanTexture(3, i) = sum(texture(3, segments==i-1))/sz;
+%         meanTexture(4, i) = sum(texture(4, segments==i-1))/sz;
+%         meanTexture(5, i) = sum(texture(5, segments==i-1))/sz;
+%         meanTexture(6, i) = sum(texture(6, segments==i-1))/sz;
+%         meanTexture(7, i) = sum(texture(7, segments==i-1))/sz;
+%         meanTexture(8, i) = sum(texture(8, segments==i-1))/sz;
+%         meanTexture(9, i) = sum(texture(9, segments==i-1))/sz;
+%         meanTexture(10, i) = sum(texture(10, segments==i-1))/sz;
+%         meanTexture(11, i) = sum(texture(11, segments==i-1))/sz;
+%         meanTexture(12, i) = sum(texture(12, segments==i-1))/sz;
+%         meanTexture(13, i) = sum(texture(13, segments==i-1))/sz;
+%         meanTexture(14, i) = sum(texture(14, segments==i-1))/sz;
+%         meanTexture(15, i) = sum(texture(15, segments==i-1))/sz;
+%         meanTexture(16, i) = sum(texture(16, segments==i-1))/sz;
     end
 
 
@@ -101,7 +121,7 @@ function main(name, lambda)
     
     tic
     %calculate dF, dB
-    [dF dB] = updateMinDis(uncertain);
+    [dF dB dTF dTB] = updateMinDis(uncertain);
     toc
    
     tic 
@@ -112,8 +132,10 @@ function main(name, lambda)
     
     tic
     %compute E1 E2
+%     E1 = updateE1(dF, dB, dTF, dTB, infinite);
+    E2 = updateE2(neighboring, param11, param12, lambda) ;
     E1 = updateE1(dF, dB, infinite);
-    E2 = updateE2(neighboring, lambda) ;
+%     E2 = updateE2(neighboring, lambda) ;
     toc
 
     tic
@@ -127,10 +149,12 @@ function main(name, lambda)
     
     
     newImg = drawResults(lab);
-%     dir = [path, 'result/SLICO/300/Cr/dis/L1/', int2str(param11),'_', int2str(param12),'/',int2str(lambda),'/'];
-    dir = [path, 'result/SLICO/300/', int2str(lambda),'/'];
+    dir = [path, 'result/SLICO/300/', name, '/'];
+%    dir = [path, 'result/SLICO/300/', name, '/Cr_052601/', int2str(param11),'_', int2str(param12),'/',int2str(lambda),'/'];
+%     dir = [path, 'result/SLICO/300/', int2str(lambda),'/'];
     if (exist(dir, 'dir') == 0), mkdir(dir); end
-    imwrite(newImg, [dir,name,'.jpg']);
+    imwrite(newImg, [dir,name,'ver2_',int2str(param11), '_', int2str(param12), '_', int2str(lambda), '.jpg']);
+%     imwrite(newImg, [dir,name,'_', int2str(lambda), '.jpg']);
     
     %///////////////////////STEP 2/////////////////////////////%
     %load mask 2

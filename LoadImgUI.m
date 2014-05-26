@@ -58,6 +58,7 @@ drawnow;
     %calculate mean color, mean coordinate of every segment
     meanColor = zeros(3, numSegments);
     meanCoord = zeros(2, numSegments);
+    meanTexture = extractTexture(rgb2gray(oriImage));
     for i = 1:numSegments
         [x,y] = find(segments==i-1);
         meanColor(1, i) = sum( sum(oriImg(x,y,1)) )/size(x,1);
