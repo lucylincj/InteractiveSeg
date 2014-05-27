@@ -6,8 +6,8 @@
 % @author: r01942054@ntu
 % @date: 05.2013
 %
-function main(name, param11, param12, lambda)
-%function main(name, lambda)
+%function main(name, param11, param12, lambda)
+function main(name, version, params)
     global oriImg numSegments meanColor meanCoord fSeg bSeg segments colorDis meanTexture;
     warning off;
     %parameters
@@ -87,22 +87,22 @@ function main(name, param11, param12, lambda)
         meanColor(3, i) = sum( sum(img(x,y,3)) )/sz;
         meanCoord(1, i) = sum(x)/sz;
         meanCoord(2, i) = sum(y)/sz;
-%         meanTexture(1, i) = sum(texture(1, segments==i-1))/sz;
-%         meanTexture(2, i) = sum(texture(2, segments==i-1))/sz;
-%         meanTexture(3, i) = sum(texture(3, segments==i-1))/sz;
-%         meanTexture(4, i) = sum(texture(4, segments==i-1))/sz;
-%         meanTexture(5, i) = sum(texture(5, segments==i-1))/sz;
-%         meanTexture(6, i) = sum(texture(6, segments==i-1))/sz;
-%         meanTexture(7, i) = sum(texture(7, segments==i-1))/sz;
-%         meanTexture(8, i) = sum(texture(8, segments==i-1))/sz;
-%         meanTexture(9, i) = sum(texture(9, segments==i-1))/sz;
-%         meanTexture(10, i) = sum(texture(10, segments==i-1))/sz;
-%         meanTexture(11, i) = sum(texture(11, segments==i-1))/sz;
-%         meanTexture(12, i) = sum(texture(12, segments==i-1))/sz;
-%         meanTexture(13, i) = sum(texture(13, segments==i-1))/sz;
-%         meanTexture(14, i) = sum(texture(14, segments==i-1))/sz;
-%         meanTexture(15, i) = sum(texture(15, segments==i-1))/sz;
-%         meanTexture(16, i) = sum(texture(16, segments==i-1))/sz;
+        meanTexture(1, i) = sum(texture(1, segments==i-1))/sz;
+        meanTexture(2, i) = sum(texture(2, segments==i-1))/sz;
+        meanTexture(3, i) = sum(texture(3, segments==i-1))/sz;
+        meanTexture(4, i) = sum(texture(4, segments==i-1))/sz;
+        meanTexture(5, i) = sum(texture(5, segments==i-1))/sz;
+        meanTexture(6, i) = sum(texture(6, segments==i-1))/sz;
+        meanTexture(7, i) = sum(texture(7, segments==i-1))/sz;
+        meanTexture(8, i) = sum(texture(8, segments==i-1))/sz;
+        meanTexture(9, i) = sum(texture(9, segments==i-1))/sz;
+        meanTexture(10, i) = sum(texture(10, segments==i-1))/sz;
+        meanTexture(11, i) = sum(texture(11, segments==i-1))/sz;
+        meanTexture(12, i) = sum(texture(12, segments==i-1))/sz;
+        meanTexture(13, i) = sum(texture(13, segments==i-1))/sz;
+        meanTexture(14, i) = sum(texture(14, segments==i-1))/sz;
+        meanTexture(15, i) = sum(texture(15, segments==i-1))/sz;
+        meanTexture(16, i) = sum(texture(16, segments==i-1))/sz;
     end
 
 
@@ -132,10 +132,8 @@ function main(name, param11, param12, lambda)
     
     tic
     %compute E1 E2
-%     E1 = updateE1(dF, dB, dTF, dTB, infinite);
-    E2 = updateE2(neighboring, param11, param12, lambda) ;
-    E1 = updateE1(dF, dB, infinite);
-%     E2 = updateE2(neighboring, lambda) ;
+    E1 = updateE1(version, infinite, dF, dB, dTF, dTB);
+	E2 = updateE2(version, neighboring, params) ;
     toc
 
     tic
@@ -148,13 +146,14 @@ function main(name, param11, param12, lambda)
     toc
     
     
-    newImg = drawResults(lab);
+    [newImg map] = drawResults(lab);
     dir = [path, 'result/SLICO/300/', name, '/'];
 %    dir = [path, 'result/SLICO/300/', name, '/Cr_052601/', int2str(param11),'_', int2str(param12),'/',int2str(lambda),'/'];
 %     dir = [path, 'result/SLICO/300/', int2str(lambda),'/'];
     if (exist(dir, 'dir') == 0), mkdir(dir); end
-    imwrite(newImg, [dir,name,'ver2_',int2str(param11), '_', int2str(param12), '_', int2str(lambda), '.jpg']);
-%     imwrite(newImg, [dir,name,'_', int2str(lambda), '.jpg']);
+	imwrite(newImg, [dir,name,'_ver1_',int2str(params(1)), '_', int2str(params(2)), '_', int2str(params(3)), '.jpg']);
+    imwrite(map*255, [dir,'map_', name,'_ver1_',int2str(params(1)), '_', int2str(params(2)), '_', int2str(params(3)), '.bmp']);
+    %imwrite(newImg, [dir,name,'_', version, '_', int2str(lambda), '.jpg']);
     
     %///////////////////////STEP 2/////////////////////////////%
     %load mask 2

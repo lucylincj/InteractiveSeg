@@ -4,20 +4,6 @@ function feature = extractTexture(image)
     feature = lawTexture( image );
 end
 
-% RGB -> LAB
-function Lab = rgb2lab(im)
- 
-    cform = makecform('srgb2lab');
-    if strcmp(class(im),'uint8')
-        im = double(im)/255;
-    end
-    
-    Lab = applycform(im, cform);
-    Lab(:, :, 1) = Lab(:, :, 1) ./ 100.0;           
-    Lab(:, :, 2) = (Lab(:, :, 2) + 128.0) ./ 255.0;
-    Lab(:, :, 3) = (Lab(:, :, 3) + 128.0) ./ 255.0;
-    
-end
 
 function feature = lawTexture(image)
 
