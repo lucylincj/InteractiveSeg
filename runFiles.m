@@ -14,13 +14,16 @@ function runFiles(listName)
 %     end
 % 
     for i = 1:N
-        for j = 1:size(param, 1)
-            for k = 1:size(lambda, 2)
-                main(fileName{i}, 'ver1', [param(j, 1), param(j, 2), lambda(k)]);
-                %imsave([tarPath,name,'.jpg']);
-                disp([fileName{i}, ' ', 'OK!']);
+        disp(fileName{i});
+        for k = 1:size(lambda, 2)
+            main('ver0', fileName{i}, lambda(k));
+            main('ver3', fileName{i}, lambda(k));
+            for j = 1:size(param, 1)
+                main('ver1', fileName{i}, [param(j, 1), param(j, 2), lambda(k)]);
+                main('ver2', fileName{i}, [param(j, 1), param(j, 2), lambda(k)]);
             end
         end
+        disp([fileName{i}, ' ', 'OK!']);
     end
     
 %     for i = 1:N

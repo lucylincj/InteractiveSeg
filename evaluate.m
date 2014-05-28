@@ -14,7 +14,7 @@ function evaluate(imgPath, gtPath, imgName)
         nameCell{i} = name;
     end
     figure;
-    subplot(1, 2, 1); bar(prTable(:, 1));
+    subplot(1, 2, 1); bar(prTable(:, 1), 'grouped', N);
     subplot(1, 2, 2); bar(prTable(:, 2));
     %set(gca, 'xticklabel', nameCell);
 end

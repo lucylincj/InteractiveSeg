@@ -16,21 +16,20 @@ function newE2 = updateE2(version, neighboring, param)
     %//////////////////////////////////////////////////////////////////////
     % Ver0
     %//////////////////////////////////////////////////////////////////////
-    if(strcmp(version, 'ver0') || strcmp(version, 'ver3') ==1)
+    if(strcmp(version, 'ver0')==1 || strcmp(version, 'ver3') ==1)
         for i = 1:size(pair1, 1)
             n1 = pair1(i);
             n2 = pair2(i);
             if( n2 > n1 && ((fSeg(n1)-bSeg(n1)) * (fSeg(n2)-bSeg(n2)) ~= 1))
                 C = colorDis(n1, n2);
-                newE2(n1, n2) = 1 / (C^2 + 1) * ...
-                sqrt((meanCoord(1, n1) - meanCoord(1, n2)).^2 + (meanCoord(2, n1) - meanCoord(2, n2)).^2);
+                newE2(n1, n2) = 1 / (C^2 + 1) * sqrt((meanCoord(1, n1) - meanCoord(1, n2)).^2 + (meanCoord(2, n1) - meanCoord(2, n2)).^2);
             end
         end
         newE2 = newE2*param(1);
     %//////////////////////////////////////////////////////////////////////
     % Ver1
     %//////////////////////////////////////////////////////////////////////
-    elseif(strcmp(version, 'ver1') || strcmp(version, 'ver2')==1)
+    elseif(strcmp(version, 'ver1')==1 || strcmp(version, 'ver2')==1)
         addUpDis = sum(colorDis, 2);
         nNeighbor = sum(neighboring, 2)/2;
     	param1 = param(1) / param(2);

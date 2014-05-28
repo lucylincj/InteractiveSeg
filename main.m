@@ -7,13 +7,13 @@
 % @date: 05.2013
 %
 %function main(name, param11, param12, lambda)
-function main(name, version, params)
-    global oriImg numSegments meanColor meanCoord fSeg bSeg segments colorDis meanTexture;
+function main(version, name, params)
+    global oriImg numSegments meanColor meanCoord fSeg bSeg segments colorDis;
     warning off;
     %parameters
     infinite = 999999;
-    %name = '0_15_15742';
     path = 'D:/InteractiveSegTestImage/';
+    dir = [path, 'result/SLICO/300/'];
     imgPath = strcat(path, name, '.jpg');
     superpixelPath = [path, 'SLICO/300/', name, '.dat'];
     maskPath = [path, 'mask1/', name, '_mask1.jpg'];
@@ -37,7 +37,7 @@ function main(name, version, params)
     %BK_BuildLib; disp('BuildLib PASSED');
     %BK_LoadLib;  disp('LoadLib PASSED');
     
-%     if(strcmp(superpixel, 'SLIC'))
+    %///////////SLIC///////////////////////////////////////////////////%
 %         regionSize = 20 ;
 %         regularizer = 10 ; 
 %         tic
@@ -54,14 +54,13 @@ function main(name, version, params)
 %         %figure; imagesc(segments);
 %         numSegments = segments(w,h) + 1;
 %         
-%     elseif(strcmp(superpixel, 'SLICO'))
+    %////////////////SLICO/////////////////////////////////////////////%
         fid=fopen(superpixelPath,'rt');
         A = fread(fid,'*uint32');
         fclose(fid);
         segments = reshape(A, h, w)';
         numSegments = max(A) + 1;
-        %//////////////////////////////////////////////////////////////%
-%     end
+    %//////////////////////////////////////////////////////////////////%
 
     %//////////////////ERS/////////////////////////////////////////////%
 %     grey_img = double(rgb2gray(oriImg));
@@ -71,14 +70,11 @@ function main(name, version, params)
 %     numSegments = max(max(segments)) + 1;
 %     fprintf(1,'Use %f sec. \n',cputime-t);
 %     fprintf(1,'\t to divide the image into %d superpixels.\n',nC);
-    
     %//////////////////////////////////////////////////////////////////%
     
     %compute mean color of each segment
     meanColor = zeros(3, numSegments);
     meanCoord = zeros(2, numSegments);
-    texture = extractTexture(rgb2gray(oriImg));
-    meanTexture = zeros(16, numSegments);
     for i = 1:numSegments
         [x,y] = find(segments==i-1);
         sz = size(x, 1);
@@ -87,24 +83,7 @@ function main(name, version, params)
         meanColor(3, i) = sum( sum(img(x,y,3)) )/sz;
         meanCoord(1, i) = sum(x)/sz;
         meanCoord(2, i) = sum(y)/sz;
-        meanTexture(1, i) = sum(texture(1, segments==i-1))/sz;
-        meanTexture(2, i) = sum(texture(2, segments==i-1))/sz;
-        meanTexture(3, i) = sum(texture(3, segments==i-1))/sz;
-        meanTexture(4, i) = sum(texture(4, segments==i-1))/sz;
-        meanTexture(5, i) = sum(texture(5, segments==i-1))/sz;
-        meanTexture(6, i) = sum(texture(6, segments==i-1))/sz;
-        meanTexture(7, i) = sum(texture(7, segments==i-1))/sz;
-        meanTexture(8, i) = sum(texture(8, segments==i-1))/sz;
-        meanTexture(9, i) = sum(texture(9, segments==i-1))/sz;
-        meanTexture(10, i) = sum(texture(10, segments==i-1))/sz;
-        meanTexture(11, i) = sum(texture(11, segments==i-1))/sz;
-        meanTexture(12, i) = sum(texture(12, segments==i-1))/sz;
-        meanTexture(13, i) = sum(texture(13, segments==i-1))/sz;
-        meanTexture(14, i) = sum(texture(14, segments==i-1))/sz;
-        meanTexture(15, i) = sum(texture(15, segments==i-1))/sz;
-        meanTexture(16, i) = sum(texture(16, segments==i-1))/sz;
     end
-
 
     %initilize forground and background segment
     fSeg = zeros(1, numSegments);
@@ -117,43 +96,76 @@ function main(name, version, params)
     for i = 1:size(b1, 1)
         bSeg(segments(b1(i), b2(i))+1) = 1;
     end
-    uncertain = find((fSeg - bSeg)==0);%this will not be changed
+    uncertain = find((fSeg - bSeg)==0);
     
-    tic
-    %calculate dF, dB
-    [dF dB dTF dTB] = updateMinDis(uncertain);
-    toc
-   
-    tic 
     %distinguish neighbors
     neighboring = FindNeighbor();
     colorDis = pdist2(meanColor', meanColor').*neighboring;
-    toc
-    
-    tic
-    %compute E1 E2
-    E1 = updateE1(version, infinite, dF, dB, dTF, dTB);
-	E2 = updateE2(version, neighboring, params) ;
-    toc
 
-    tic
+    if(strcmp(version, 'ver0')==1)
+        tarName = [name,'_', version, '_',int2str(params(1))];
+        
+        %calculate dF, dB
+        [dF dB] = updateMinDis(version, uncertain);
+
+        %compute E1 E2
+        E1 = updateE1(version, infinite, dF, dB);
+        E2 = updateE2(version, neighboring, params) ;
+        
+    elseif(strcmp(version, 'ver1'))
+        tarName = [name,'_', version, '_',int2str(params(1)), '_', int2str(params(2)), '_', int2str(params(3))];
+        
+        texture = extractTexture(rgb2gray(oriImg));
+        computeMeanTexture(texture);
+        
+        %calculate dF, dB
+        [dF dB dTF dTB] = updateMinDis(version, uncertain);
+
+        %compute E1 E2
+        E1 = updateE1(version, infinite, dF, dB, dTF, dTB);
+        E2 = updateE2(version, neighboring, params) ;
+        
+     elseif(strcmp(version, 'ver2'))
+        tarName = [name,'_', version, '_',int2str(params(1)), '_', int2str(params(2)), '_', int2str(params(3))];
+        
+        %calculate dF, dB
+        [dF dB] = updateMinDis(version, uncertain);
+
+        %compute E1 E2
+        E1 = updateE1(version, infinite, dF, dB);
+        E2 = updateE2(version, neighboring, params) ;
+    elseif(strcmp(version, 'ver3'))
+        tarName = [name,'_', version, '_',int2str(params(1))];
+        
+        texture = extractTexture(rgb2gray(oriImg));
+        computeMeanTexture(texture);
+        
+        %calculate dF, dB
+        [dF dB dTF dTB] = updateMinDis(version, uncertain);
+        
+        %compute E1 E2
+        E1 = updateE1(version, infinite, dF, dB, dTF, dTB);
+        E2 = updateE2(version, neighboring, params) ;
+
+    end
+    %graph cut
     hinc = BK_Create(numSegments,2*numSegments);
     BK_SetUnary(hinc, E1); 
     BK_SetNeighbors(hinc, E2);
     e_inc = BK_Minimize(hinc);
     lab = BK_GetLabeling(hinc);
     BK_Delete(hinc);
-    toc
     
-    
+    %display and save file
     [newImg map] = drawResults(lab);
-    dir = [path, 'result/SLICO/300/', name, '/'];
-%    dir = [path, 'result/SLICO/300/', name, '/Cr_052601/', int2str(param11),'_', int2str(param12),'/',int2str(lambda),'/'];
-%     dir = [path, 'result/SLICO/300/', int2str(lambda),'/'];
-    if (exist(dir, 'dir') == 0), mkdir(dir); end
-	imwrite(newImg, [dir,name,'_ver1_',int2str(params(1)), '_', int2str(params(2)), '_', int2str(params(3)), '.jpg']);
-    imwrite(map*255, [dir,'map_', name,'_ver1_',int2str(params(1)), '_', int2str(params(2)), '_', int2str(params(3)), '.bmp']);
-    %imwrite(newImg, [dir,name,'_', version, '_', int2str(lambda), '.jpg']);
+    path1 = [dir, name, '/'];
+    if (exist(path1, 'dir') == 0), mkdir(path1); end
+	imwrite(newImg, [path1, tarName, '.jpg']);
+    imwrite(map*255, [path1, 'map_', tarName, '.bmp']);
+    path2 = [dir, version, '/'];
+    if (exist(path2, 'dir') == 0), mkdir(path2); end
+    imwrite(newImg, [path2, tarName, '.jpg']);
+    imwrite(map*255, [path2, 'map_', tarName, '.bmp']);
     
     %///////////////////////STEP 2/////////////////////////////%
     %load mask 2
@@ -198,6 +210,5 @@ function main(name, version, params)
 %     resultImg(:, :, 3)  = oriImg(:, :, 3) .* uint8(map);
 % 
 %     figure; imshow(resultImg);
-
 end
   
