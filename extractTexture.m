@@ -9,12 +9,12 @@ function feature = lawTexture(image)
 
 if(size(image, 3)~=1)    
     lab = rgb2lab(image);
-    img = lab(:, :, 1);
+    img = lab(:, :, 1) ./ 100;
 else
-    img = image;
-    if strcmp(class(img),'uint8')
-        img = double(img)/255;
-    end
+    img = image ./ 255;
+%     if strcmp(class(img),'uint8')
+%         img = double(img)/255;
+%     end
 end
    
     L = [ 1  4  6  4  1; 

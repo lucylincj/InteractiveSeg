@@ -1,13 +1,13 @@
 %///
-% main class for testing and demo
+% main class for testing GrabCut database
 % already blocked the interactive part
 % please change paths to load in different image set (line 12-14)
-% @parameter: input'SLIC' or 'SLICO'
+%
 % @author: r01942054@ntu
 % @date: 05.2013
 %
 %function main(name, param11, param12, lambda)
-function main(version, name, params, type)
+function mainGC(version, name, params, type)
     global oriImg numSegments meanColor meanCoord fSeg bSeg segments colorDis;
     warning off;
     %parameters: change paths if needed
@@ -16,6 +16,7 @@ function main(version, name, params, type)
     dir = [path, 'result/ERS/200/'];
     imgPath = strcat(path, 'data_GT/', name, type);
     superpixelPath = [path, 'SLICO/200/', name, '.dat'];
+    ERSPath = [path, 'ERS/200/', name, '.mat'];
     maskPath = [path, 'boundary_GT_lasso/', name, '.bmp'];
     %maskPath = [path, 'mask1/', name, '_mask1.jpg'];
     %maskPath2 = [path, 'mask2/', name, '_mask2.jpg'];
@@ -24,6 +25,7 @@ function main(version, name, params, type)
     addpath('Bk') ;
     addpath('Bk/bin') ;
     addpath(genpath('vlfeat-0.9.18')) ;
+    addpath('testGCUtil') ;
 
     %load image
     oriImg = imread(imgPath);
@@ -64,14 +66,19 @@ function main(version, name, params, type)
 %         numSegments = max(A) + 1;
     %//////////////////////////////////////////////////////////////////%
 
-    %//////////////////ERS/////////////////////////////////////////////%
-    grey_img = double(rgb2gray(oriImg));
-    nC = floor(w*h/200);
-    t = cputime;
-    [segments] = mex_ers(grey_img,nC);
+    %////////////////runERS////////////////////////////////////////////%
+%     grey_img = double(rgb2gray(oriImg));
+%     nC = floor(w*h/200);
+%     t = cputime;
+%     [segments] = mex_ers(grey_img,nC);
+%     numSegments = max(max(segments)) + 1;
+%     fprintf(1,'Use %f sec. \n',cputime-t);
+%     fprintf(1,'\t to divide the image into %d superpixels.\n',nC);
+    %//////////////////////////////////////////////////////////////////%
+    
+    %////////////////loadERS///////////////////////////////////////////%
+    segments = load(ERSPath, '-ascii');
     numSegments = max(max(segments)) + 1;
-    fprintf(1,'Use %f sec. \n',cputime-t);
-    fprintf(1,'\t to divide the image into %d superpixels.\n',nC);
     %//////////////////////////////////////////////////////////////////%
     
     %compute mean color of each segment
@@ -121,17 +128,23 @@ function main(version, name, params, type)
     %//////////////////////////////////////////////////////////////////////
     fSeg = zeros(1, numSegments);
     bSeg = zeros(1, numSegments);
+    closebSeg = zeros(1, numSegments);
     % for Grabcut database : 
     % foreground: 255, background: 64, uncertain: 128
     [f1, f2] = find(imgMask(:,:)==255);
-    [b1, b2] = find(imgMask(:,:)<=64);
+    [b1, b2] = find(imgMask(:,:)==64);
+    [b3, b4] = find(imgMask(:,:)==0);
 %     [f1, f2] = find(imgMask(:,:,1) - imgMask(:,:,2) > 200);
 %     [b1, b2] = find(imgMask(:,:,3) - imgMask(:,:,2) > 200);
     for i = 1:size(f1, 1)
         fSeg(segments(f1(i), f2(i))+1) = 1;
     end
     for i = 1:size(b1, 1)
-        bSeg(segments(b1(i), b2(i))+1) = 1;
+        closebSeg(segments(b1(i), b2(i))+1) = 1;
+        bSeg(segments(b3(i), b4(i))+1) = 1;
+    end
+    for i = 1:size(b3, 1)
+        bSeg(segments(b3(i), b4(i))+1) = 1;
     end
     uncertain = find((fSeg - bSeg)==0);
     

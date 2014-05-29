@@ -14,9 +14,9 @@ function newE2 = updateE2(version, neighboring, param)
     newE2 = zeros(numSegments, numSegments);
     [pair1, pair2] = find(triu(neighboring, 1)==1);
     %//////////////////////////////////////////////////////////////////////
-    % Ver0
+    % Ver0, 3, 4
     %//////////////////////////////////////////////////////////////////////
-    if(strcmp(version, 'ver0')==1 || strcmp(version, 'ver3') ==1)
+    if(strcmp(version, 'ver0')==1 || strcmp(version, 'ver3') ==1 || strcmp(version, 'ver4') ==1)
         for i = 1:size(pair1, 1)
             n1 = pair1(i);
             n2 = pair2(i);
@@ -27,7 +27,7 @@ function newE2 = updateE2(version, neighboring, param)
         end
         newE2 = newE2*param(1);
     %//////////////////////////////////////////////////////////////////////
-    % Ver1
+    % Ver1, 2
     %//////////////////////////////////////////////////////////////////////
     elseif(strcmp(version, 'ver1')==1 || strcmp(version, 'ver2')==1)
         addUpDis = sum(colorDis, 2);

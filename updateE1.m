@@ -2,9 +2,9 @@ function E1 = updateE1(version, infinite, dF, dB, dTF, dTB)
 %function E1 = updateE1(dF, dB, infinite)
     global numSegments fSeg bSeg;
     E1 = zeros(2, numSegments);
-    if(strcmp(version, 'ver0')==1 || strcmp(version, 'ver2')==1)
+    if(strcmp(version, 'ver0')==1 || strcmp(version, 'ver2')==1 || strcmp(version, 'ver4') ==1)
         for i = 1:numSegments
-            if ( bSeg(i) == 1 )%background
+            if ( bSeg(i) >= 1 )%background
                 E1(1, i) = 0;
                 E1(2, i) = infinite;
             elseif ( fSeg(i) == 1)%foreground
