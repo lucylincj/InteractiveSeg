@@ -8,7 +8,7 @@
 %
 %function main(name, param11, param12, lambda)
 function mainGC(version, name, params, type)
-    global oriImg numSegments meanColor meanCoord fSeg bSeg segments colorDis;
+    global oriImg numSegments meanColor meanCoord fSeg bSeg segments colorDis texDis lumDis meanTexture closebSeg;
     warning off;
     %parameters: change paths if needed
     infinite = 999999;
@@ -106,6 +106,20 @@ function mainGC(version, name, params, type)
             meanCoord(2, i) = sum(y)/sz;
             %test(segments==i-1) = meanColor(1, i);
         end
+    elseif(strcmp(version, 'ver5')==1)
+        gray_img = rgb2gray(oriImg);
+        Layer1 = img(:,:,1);
+        Layer2 = img(:,:,2);
+        Layer3 = img(:,:,3);
+        meanColor = zeros(4, numSegments);
+        for i = 1:numSegments
+            [x,y] = find(segments==i-1);
+            sz = size(x, 1);
+            meanColor(1, i) = sum( sum(Layer1(segments==i-1)) )/sz;
+            meanColor(2, i) = sum( sum(Layer2(segments==i-1)) )/sz;
+            meanColor(3, i) = sum( sum(Layer3(segments==i-1)) )/sz;
+            meanColor(4, i) = sum( sum(gray_img(segments==i-1)) )/sz;
+        end    
     else
         Layer1 = img(:,:,1);
         Layer2 = img(:,:,2);
@@ -141,7 +155,7 @@ function mainGC(version, name, params, type)
     end
     for i = 1:size(b1, 1)
         closebSeg(segments(b1(i), b2(i))+1) = 1;
-        bSeg(segments(b3(i), b4(i))+1) = 1;
+        bSeg(segments(b1(i), b2(i))+1) = 1;
     end
     for i = 1:size(b3, 1)
         bSeg(segments(b3(i), b4(i))+1) = 1;
@@ -196,7 +210,22 @@ function mainGC(version, name, params, type)
         %compute E1 E2
         E1 = updateE1(version, infinite, dF, dB, dTF, dTB);
         E2 = updateE2(version, neighboring, params) ;
+    elseif(strcmp(version, 'ver5'))
+        tarName = [name,'_', version, '_',int2str(params(1))];
         
+        texture = extractTexture(oriImg, 'gabor');
+        computeMeanTexture(texture);
+        texDis = pdist2(meanTexture', meanTexture').*neighboring;
+        lumDis = pdist2(meanColor(4,:)', meanColor(4,:)').*neighboring;
+        
+        %calculate dF, dB
+        [dF dB dTF dTB] = updateMinDisGC(version, uncertain);
+        
+        %compute E1 E2
+        E1 = updateE1(version, infinite, dF, dB, dTF, dTB);
+        E2 = updateE2(version, neighboring, params);
+        %mydisplay(segments, numSegments, E1(1,:)-fSeg*infinite);
+        %mydisplay(segments, numSegments, E1(2,:)-bSeg*infinite);        
 
     end
     %graph cut

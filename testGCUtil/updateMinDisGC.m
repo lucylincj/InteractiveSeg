@@ -1,5 +1,5 @@
 function [dF dB dTF dTB] = updateMinDisGC(version, uncertain)
-    global numSegments meanColor fSeg bSeg meanTexture closebSeg;
+    global numSegments meanColor fSeg meanTexture closebSeg;
     dF = zeros(1, numSegments);
     dB = zeros(1, numSegments);
     dTF = zeros(16, numSegments);
@@ -12,7 +12,7 @@ function [dF dB dTF dTB] = updateMinDisGC(version, uncertain)
             dF(j) = sqrt(min(dis(fSeg==1)));
             dB(j) = sqrt(min(dis(closebSeg==1)));
         end
-    elseif(strcmp(version, 'ver1') == 1 || strcmp(version, 'ver3')==1)
+    elseif(strcmp(version, 'ver1') == 1 || strcmp(version, 'ver3')==1 || strcmp(version, 'ver5')==1)
         for i = 1:size(uncertain, 2)
             j = uncertain(i);
             seg = repmat(meanColor(:,j ), 1, numSegments);

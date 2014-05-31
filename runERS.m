@@ -1,11 +1,11 @@
 function runERS(nC)
     %Path and parameters
     disp('Entropy Rate Superpixel Segmentation');
-    path = 'D:/InteractiveSegTestImage/GrabcutDatabase/data_GT/';
-    tarPath = 'D:/InteractiveSegTestImage/GrabcutDatabase/ERS/';
-    fileList = dir(strcat(path,'*'));
+    path = 'D:/InteractiveSegTestImage/image/';
+    tarPath = 'D:/InteractiveSegTestImage/ERS/';
+    fileList = dir(strcat(path,'*.jpg'));
     N = size(fileList, 1);
-    for i = 3:N
+    for i = 1:N
         [dum, name, type] = fileparts(fileList(i).name);
         imgPath = strcat(path, name, type);
         img = imread(imgPath);
@@ -18,9 +18,10 @@ function runERS(nC)
         %/////////////////////////segmentation////////////////////////////////
         t = cputime;
         n = round(size(grey_img, 1) * size(grey_img, 2) / nC);
-        [segments] = mex_ers(grey_img,n);
+        [segments] = mex_ers(grey_img,n,0.5,5);
         fprintf(1,'Use %f sec. \n',cputime-t);
         fprintf(1,'\t to divide the image into %d superpixels.\n',n);
+        if (exist([tarPath,num2str(nC), '/'], 'dir') == 0), mkdir([tarPath,num2str(nC), '/']); end
         save(strcat(tarPath,num2str(nC), '/',name,'.mat'), 'segments', '-ascii');
         %load('21077.mat', '-ascii');
     
@@ -54,6 +55,7 @@ function runERS(nC)
     displayImg(:,:,1) = layerR;
     displayImg(:,:,2) = layerG;
     displayImg(:,:,3) = layerB;
+    
     imwrite(displayImg, [tarPath,num2str(nC), '/',name,'.png']);
     %figure; imshow(displayImg);
     %figure; imshow(grey_img,[]);

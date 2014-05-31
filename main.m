@@ -8,22 +8,24 @@
 %
 %function main(name, param11, param12, lambda)
 function main(version, name, params, type)
-    global oriImg numSegments meanColor meanCoord fSeg bSeg segments colorDis;
+    global oriImg numSegments meanColor meanCoord fSeg bSeg segments colorDis lumDis texDis meanTexture;
     warning off;
     %parameters: change paths if needed
     infinite = 999999;
-    path = 'D:/InteractiveSegTestImage/GrabcutDatabase/';
-    dir = [path, 'result/ERS/200/'];
-    imgPath = strcat(path, 'data_GT/', name, type);
+    path = 'D:/InteractiveSegTestImage/';
+    dir = [path, 'test/ERS/300/'];
+    imgPath = strcat(path, 'image/', name, '.jpg');
     superpixelPath = [path, 'SLICO/200/', name, '.dat'];
-    maskPath = [path, 'boundary_GT_lasso/', name, '.bmp'];
-    %maskPath = [path, 'mask1/', name, '_mask1.jpg'];
+    ERSPath = [path, 'ERS/300/', name, '.mat'];
+    %maskPath = [path, 'boundary_GT_lasso/', name, '.bmp'];
+    maskPath = [path, 'mask1/', name, '_mask1.jpg'];
     %maskPath2 = [path, 'mask2/', name, '_mask2.jpg'];
     
     %add necessary path
     addpath('Bk') ;
     addpath('Bk/bin') ;
     addpath(genpath('vlfeat-0.9.18')) ;
+    %addpath('gabor');
 
     %load image
     oriImg = imread(imgPath);
@@ -64,15 +66,21 @@ function main(version, name, params, type)
 %         numSegments = max(A) + 1;
     %//////////////////////////////////////////////////////////////////%
 
-    %//////////////////ERS/////////////////////////////////////////////%
-    grey_img = double(rgb2gray(oriImg));
-    nC = floor(w*h/200);
-    t = cputime;
-    [segments] = mex_ers(grey_img,nC);
-    numSegments = max(max(segments)) + 1;
-    fprintf(1,'Use %f sec. \n',cputime-t);
-    fprintf(1,'\t to divide the image into %d superpixels.\n',nC);
+    %////////////////runERS////////////////////////////////////////////%
+%     grey_img = double(rgb2gray(oriImg));
+%     nC = floor(w*h/200);
+%     t = cputime;
+%     [segments] = mex_ers(grey_img,nC);
+%     numSegments = max(max(segments)) + 1;
+%     fprintf(1,'Use %f sec. \n',cputime-t);
+%     fprintf(1,'\t to divide the image into %d superpixels.\n',nC);
     %//////////////////////////////////////////////////////////////////%
+    
+    %////////////////loadERS///////////////////////////////////////////%
+    segments = load(ERSPath, '-ascii');
+    numSegments = max(max(segments)) + 1;
+    %//////////////////////////////////////////////////////////////////%
+
     
     %compute mean color of each segment
 
@@ -99,6 +107,20 @@ function main(version, name, params, type)
             meanCoord(2, i) = sum(y)/sz;
             %test(segments==i-1) = meanColor(1, i);
         end
+    elseif(strcmp(version, 'ver5')==1)
+        gray_img = rgb2gray(oriImg);
+        Layer1 = img(:,:,1);
+        Layer2 = img(:,:,2);
+        Layer3 = img(:,:,3);
+        meanColor = zeros(4, numSegments);
+        for i = 1:numSegments
+            [x,y] = find(segments==i-1);
+            sz = size(x, 1);
+            meanColor(1, i) = sum( sum(Layer1(segments==i-1)) )/sz;
+            meanColor(2, i) = sum( sum(Layer2(segments==i-1)) )/sz;
+            meanColor(3, i) = sum( sum(Layer3(segments==i-1)) )/sz;
+            meanColor(4, i) = sum( sum(gray_img(segments==i-1)) )/sz;
+        end
     else
         Layer1 = img(:,:,1);
         Layer2 = img(:,:,2);
@@ -121,17 +143,14 @@ function main(version, name, params, type)
     %//////////////////////////////////////////////////////////////////////
     fSeg = zeros(1, numSegments);
     bSeg = zeros(1, numSegments);
-    % for Grabcut database : 
-    % foreground: 255, background: 64, uncertain: 128
-    [f1, f2] = find(imgMask(:,:)==255);
-    [b1, b2] = find(imgMask(:,:)<=64);
-%     [f1, f2] = find(imgMask(:,:,1) - imgMask(:,:,2) > 200);
-%     [b1, b2] = find(imgMask(:,:,3) - imgMask(:,:,2) > 200);
-    for i = 1:size(f1, 1)
-        fSeg(segments(f1(i), f2(i))+1) = 1;
-    end
+    [f1, f2] = find(imgMask(:,:,1) - imgMask(:,:,2) > 200);
+    [b1, b2] = find(imgMask(:,:,3) - imgMask(:,:,2) > 200);
+
     for i = 1:size(b1, 1)
         bSeg(segments(b1(i), b2(i))+1) = 1;
+    end
+    for i = 1:size(f1, 1)
+        fSeg(segments(f1(i), f2(i))+1) = 1;
     end
     uncertain = find((fSeg - bSeg)==0);
     
@@ -152,7 +171,7 @@ function main(version, name, params, type)
     elseif(strcmp(version, 'ver1')==1)
         tarName = [name,'_', version, '_',int2str(params(1)), '_', int2str(params(2)), '_', int2str(params(3))];
         
-        texture = extractTexture(rgb2gray(oriImg));
+        texture = extractTexture(oriImg, 'gabor');
         computeMeanTexture(texture);
         
         %calculate dF, dB
@@ -171,11 +190,27 @@ function main(version, name, params, type)
         %compute E1 E2
         E1 = updateE1(version, infinite, dF, dB);
         E2 = updateE2(version, neighboring, params) ;
+    elseif(strcmp(version, 'ver5'))
+        tarName = [name,'_', version, '_',int2str(params(1))];
+        
+        texture = extractTexture(oriImg, 'gabor');
+        computeMeanTexture(texture);
+        texDis = pdist2(meanTexture', meanTexture').*neighboring;
+        lumDis = pdist2(meanColor(4,:)', meanColor(4,:)').*neighboring;
+        
+        %calculate dF, dB
+        [dF dB dTF dTB] = updateMinDis(version, uncertain);
+        
+        %compute E1 E2
+        E1 = updateE1(version, infinite, dF, dB, dTF, dTB);
+        E2 = updateE2(version, neighboring, params);
+        %mydisplay(segments, numSegments, E1(1,:)-fSeg*infinite);
+        %mydisplay(segments, numSegments, E1(2,:)-bSeg*infinite);
+        
     elseif(strcmp(version, 'ver3'))
         tarName = [name,'_', version, '_',int2str(params(1))];
         
-        texture = extractTexture(rgb2gray(oriImg));
-        computeMeanTexture(texture);
+        texture = extractTexture(rgb2gray(oriImg));       
         
         %calculate dF, dB
         [dF dB dTF dTB] = updateMinDis(version, uncertain);
@@ -183,7 +218,7 @@ function main(version, name, params, type)
         %compute E1 E2
         E1 = updateE1(version, infinite, dF, dB, dTF, dTB);
         E2 = updateE2(version, neighboring, params) ;
-        
+
 
     end
     %graph cut

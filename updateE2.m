@@ -10,7 +10,7 @@
 % date : 2014.05
 %//////////////////////////////////////////////////////////////////////////
 function newE2 = updateE2(version, neighboring, param)
-    global numSegments fSeg bSeg meanColor meanCoord colorDis ; 
+    global numSegments fSeg bSeg meanCoord colorDis texDis lumDis; 
     newE2 = zeros(numSegments, numSegments);
     [pair1, pair2] = find(triu(neighboring, 1)==1);
     %//////////////////////////////////////////////////////////////////////
@@ -22,7 +22,8 @@ function newE2 = updateE2(version, neighboring, param)
             n2 = pair2(i);
             if( n2 > n1 && ((fSeg(n1)-bSeg(n1)) * (fSeg(n2)-bSeg(n2)) ~= 1))
                 C = colorDis(n1, n2);
-                newE2(n1, n2) = 1 / (C^2 + 1) * sqrt((meanCoord(1, n1) - meanCoord(1, n2)).^2 + (meanCoord(2, n1) - meanCoord(2, n2)).^2);
+                %newE2(n1, n2) = 1 / (C^2 + 1) * sqrt((meanCoord(1, n1) - meanCoord(1, n2)).^2 + (meanCoord(2, n1) - meanCoord(2, n2)).^2);
+                newE2(n1, n2) = 1 / (C^2 + 1);
             end
         end
         newE2 = newE2*param(1);
@@ -46,5 +47,18 @@ function newE2 = updateE2(version, neighboring, param)
             end
         end
         newE2 = newE2*param(3);
+    elseif(strcmp(version, 'ver5') ==1)
+        for i = 1:size(pair1, 1)
+            n1 = pair1(i);
+            n2 = pair2(i);
+            if( n2 > n1 && ((fSeg(n1)-bSeg(n1)) * (fSeg(n2)-bSeg(n2)) ~= 1))
+                C = colorDis(n1, n2);
+                T = texDis(n1, n2);
+                Y = lumDis(n1, n2);
+                %newE2(n1, n2) = 1 / (C^2 + 1) * sqrt((meanCoord(1, n1) - meanCoord(1, n2)).^2 + (meanCoord(2, n1) - meanCoord(2, n2)).^2);
+                newE2(n1, n2) = 1 / (C + T*100 + Y);
+            end
+        end
+        newE2 = newE2*param(1)/10;
     end
 end

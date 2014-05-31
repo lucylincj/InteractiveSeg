@@ -1,4 +1,4 @@
-function prTable = evaluate(imgPath, gtPath, imgName)
+function [prTable nameCell]  = evaluate(imgPath, gtPath, imgName)
 % evaluate('D:/InteractiveSegTestImage/result/SLICO/300/0_5_5887/', 'D:/InteractiveSegTestImage/groundTruth/','0_5_5887')
     fileList = dir(strcat(imgPath,'map*'));
     N = size(fileList, 1);
